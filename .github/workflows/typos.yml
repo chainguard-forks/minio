@@ -2,14 +2,22 @@
 name: Spelling
 on: [pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   run:
     name: Spell Check with Typos
     runs-on: ubuntu-latest
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+      with:
+        egress-policy: audit
+
     - name: Checkout Actions Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
     - name: Check spelling of repo
-      uses: crate-ci/typos@master
+      uses: crate-ci/typos@a2568ec213bdbd8e534408119c9159444edc721a # master
 
