@@ -1,0 +1,28 @@
+# Build stage - compile MinIO for Linux
+FROM golang:1.24-alpine AS builder
+
+RUN apk add --no-cache git
+
+WORKDIR /build
+
+# Copy go module files first for better caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code and build
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o minio .
+
+# Final stage
+FROM minio/minio:latest
+
+RUN chmod -R 777 /usr/bin
+
+COPY --from=builder /build/minio /usr/bin/minio
+COPY dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
+
+VOLUME ["/data"]
+
+CMD ["minio"]
