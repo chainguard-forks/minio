@@ -80,10 +80,14 @@ services:
       - "9000:9000"
       - "9001:9001"
     depends_on:
-      - minio1
-      - minio2
-      - minio3
-      - minio4
+      minio1:
+        condition: service_healthy
+      minio2:
+        condition: service_healthy
+      minio3:
+        condition: service_healthy
+      minio4:
+        condition: service_healthy
 
 ## By default this config uses default local driver,
 ## For custom volumes replace with volume driver configuration.

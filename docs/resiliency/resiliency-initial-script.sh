@@ -14,7 +14,7 @@ SRC_DIR="/tmp/data"
 INLINED_DIR="/tmp/inlined"
 DEST_DIR="/tmp/dest"
 
-TIMEOUT=10
+TIMEOUT=60
 while true; do
 	if [[ ${TIMEOUT} -le 0 ]]; then
 		echo retry: timeout while running: mc alias set
