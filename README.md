@@ -1,6 +1,6 @@
 > [!IMPORTANT]
 >
-> This is a supported replacement of the original [criteo/cassandra_exporter](https://github.com/criteo/cassandra_exporter) repository.
+> This is a supported replacement of the original [minio](https://github.com/minio/minio) repository.
 >
 > Community contributions are not being accepted at this time. The documentation has been carried over directly from the original repository and may not reflect recent changes.
 >
