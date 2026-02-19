@@ -24,8 +24,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/minio/minio-go/v7/pkg/set"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/minio-go/v7/pkg/set"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 )

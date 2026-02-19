@@ -29,10 +29,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/minio/minio-go/v7/pkg/encrypt"
-	"github.com/minio/minio-go/v7/pkg/set"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/s3select/jstream"
+	"github.com/minio/minio-go/v7/pkg/encrypt"
+	"github.com/minio/minio-go/v7/pkg/set"
 )
 
 // startWithConds - map which indicates if a given condition supports starts-with policy operator

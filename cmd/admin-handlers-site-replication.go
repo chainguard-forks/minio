@@ -29,9 +29,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/dustin/go-humanize"
 	"github.com/minio/madmin-go/v3"
-	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

@@ -27,7 +27,6 @@ import (
 
 	"github.com/chainguard-forks/minio/internal/config/browser"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/chainguard-forks/minio/internal/config/api"
 	"github.com/chainguard-forks/minio/internal/config/batch"
@@ -52,6 +51,7 @@ import (
 	"github.com/chainguard-forks/minio/internal/crypto"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/pkg/v3/env"
 )
 

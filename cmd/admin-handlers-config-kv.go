@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/chainguard-forks/minio/internal/config/etcd"
 	xldap "github.com/chainguard-forks/minio/internal/config/identity/ldap"
@@ -36,6 +35,7 @@ import (
 	"github.com/chainguard-forks/minio/internal/config/storageclass"
 	"github.com/chainguard-forks/minio/internal/config/subnet"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

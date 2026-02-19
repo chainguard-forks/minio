@@ -29,12 +29,12 @@ import (
 	"time"
 	"unicode/utf8"
 
-	jsoniter "github.com/json-iterator/go"
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/config"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/chainguard-forks/minio/internal/kms"
 	"github.com/chainguard-forks/minio/internal/logger"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/puzpuzpuz/xsync/v3"
 )

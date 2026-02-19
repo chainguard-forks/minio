@@ -25,8 +25,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/madmin-go/v3"
 )
 
 // From Veeam-SOSAPI_1.0_Document_v1.02d.pdf

@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/cachevalue"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/madmin-go/v3"
 )
 
 // BucketQuotaSys - map of bucket and quota configuration.

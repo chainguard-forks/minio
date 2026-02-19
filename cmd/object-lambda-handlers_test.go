@@ -30,12 +30,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio-go/v7/pkg/signer"
 	"github.com/chainguard-forks/minio/internal/auth"
 	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/chainguard-forks/minio/internal/config/lambda"
 	levent "github.com/chainguard-forks/minio/internal/config/lambda/event"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/minio/minio-go/v7/pkg/signer"
 )
 
 func TestGetObjectLambdaHandler(t *testing.T) {

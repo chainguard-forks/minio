@@ -27,9 +27,9 @@ import (
 	"sync"
 	"time"
 
-	jwtgo "github.com/golang-jwt/jwt/v4"
 	"github.com/chainguard-forks/minio/internal/arn"
 	"github.com/chainguard-forks/minio/internal/auth"
+	jwtgo "github.com/golang-jwt/jwt/v4"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/minio/pkg/v3/policy"
 )

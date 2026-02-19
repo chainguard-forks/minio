@@ -31,9 +31,9 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/klauspost/compress/zip"
 	"github.com/minio/madmin-go/v3"
-	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/minio/pkg/v3/workers"

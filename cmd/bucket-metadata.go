@@ -29,8 +29,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio-go/v7/pkg/tags"
 	bucketsse "github.com/chainguard-forks/minio/internal/bucket/encryption"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	objectlock "github.com/chainguard-forks/minio/internal/bucket/object/lock"
@@ -40,6 +38,8 @@ import (
 	"github.com/chainguard-forks/minio/internal/event"
 	"github.com/chainguard-forks/minio/internal/kms"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/minio/madmin-go/v3"
+	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/minio/pkg/v3/policy"
 	"github.com/minio/sio"
 )

@@ -34,7 +34,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	"github.com/chainguard-forks/minio/internal/bucket/object/lock"
 	"github.com/chainguard-forks/minio/internal/bucket/replication"
@@ -42,6 +41,7 @@ import (
 	"github.com/chainguard-forks/minio/internal/config/heal"
 	"github.com/chainguard-forks/minio/internal/event"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/pkg/v3/console"
 	uatomic "go.uber.org/atomic"
 )

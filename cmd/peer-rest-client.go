@@ -30,12 +30,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/bucket/bandwidth"
 	"github.com/chainguard-forks/minio/internal/grid"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/chainguard-forks/minio/internal/rest"
+	"github.com/minio/madmin-go/v3"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

@@ -26,8 +26,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dustin/go-humanize"
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	objectlock "github.com/chainguard-forks/minio/internal/bucket/object/lock"
 	"github.com/chainguard-forks/minio/internal/bucket/replication"
@@ -35,6 +33,8 @@ import (
 	"github.com/chainguard-forks/minio/internal/color"
 	"github.com/chainguard-forks/minio/internal/config/storageclass"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/dustin/go-humanize"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/pkg/v3/console"
 	"github.com/minio/pkg/v3/wildcard"
 	"github.com/minio/pkg/v3/workers"

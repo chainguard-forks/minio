@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/chainguard-forks/minio/internal/kms"
+	"github.com/minio/madmin-go/v3"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

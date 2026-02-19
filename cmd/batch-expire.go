@@ -29,10 +29,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/chainguard-forks/minio/internal/bucket/versioning"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
+	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/minio/pkg/v3/env"
 	"github.com/minio/pkg/v3/wildcard"
 	"github.com/minio/pkg/v3/workers"

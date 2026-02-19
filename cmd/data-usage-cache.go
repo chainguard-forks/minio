@@ -32,10 +32,10 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	"github.com/dustin/go-humanize"
 	"github.com/klauspost/compress/zstd"
 	"github.com/minio/madmin-go/v3"
-	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/valyala/bytebufferpool"
 )

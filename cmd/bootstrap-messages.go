@@ -21,8 +21,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/pubsub"
+	"github.com/minio/madmin-go/v3"
 )
 
 const bootstrapTraceLimit = 4 << 10

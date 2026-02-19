@@ -26,13 +26,13 @@ import (
 	"strings"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
-	miniogopolicy "github.com/minio/minio-go/v7/pkg/policy"
-	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/chainguard-forks/minio/internal/auth"
 	"github.com/chainguard-forks/minio/internal/handlers"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/logger"
+	jsoniter "github.com/json-iterator/go"
+	miniogopolicy "github.com/minio/minio-go/v7/pkg/policy"
+	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/minio/pkg/v3/policy"
 )
 

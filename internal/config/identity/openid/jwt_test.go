@@ -30,10 +30,10 @@ import (
 	"testing"
 	"time"
 
-	jwtgo "github.com/golang-jwt/jwt/v4"
 	"github.com/chainguard-forks/minio/internal/arn"
 	"github.com/chainguard-forks/minio/internal/config"
 	jwtm "github.com/chainguard-forks/minio/internal/jwt"
+	jwtgo "github.com/golang-jwt/jwt/v4"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

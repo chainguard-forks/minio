@@ -38,13 +38,13 @@ import (
 	"github.com/chainguard-forks/minio/internal/grid"
 	"github.com/tinylib/msgp/msgp"
 
-	jwtreq "github.com/golang-jwt/jwt/v4/request"
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/config"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	xjwt "github.com/chainguard-forks/minio/internal/jwt"
 	"github.com/chainguard-forks/minio/internal/logger"
+	jwtreq "github.com/golang-jwt/jwt/v4/request"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/mux"
 	xnet "github.com/minio/pkg/v3/net"
 )

@@ -27,8 +27,8 @@ import (
 	"sync"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/klauspost/reedsolomon"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/klauspost/reedsolomon"
 )
 
 // Erasure - erasure encoding details.

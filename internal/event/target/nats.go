@@ -28,11 +28,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/uuid"
 	"github.com/chainguard-forks/minio/internal/event"
 	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/chainguard-forks/minio/internal/once"
 	"github.com/chainguard-forks/minio/internal/store"
+	"github.com/google/uuid"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"

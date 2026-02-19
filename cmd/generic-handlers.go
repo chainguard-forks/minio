@@ -29,10 +29,10 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/chainguard-forks/minio/internal/grid"
 	"github.com/dustin/go-humanize"
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/chainguard-forks/minio/internal/grid"
 	xnet "github.com/minio/pkg/v3/net"
 
 	"github.com/chainguard-forks/minio/internal/amztime"

@@ -31,9 +31,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/chainguard-forks/minio/internal/config"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 var (

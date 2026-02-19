@@ -26,10 +26,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/chainguard-forks/minio/internal/bucket/object/lock"
 	"github.com/chainguard-forks/minio/internal/bucket/replication"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/google/uuid"
 )
 
 var (

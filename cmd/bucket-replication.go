@@ -35,11 +35,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/dustin/go-humanize"
-	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/encrypt"
-	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/chainguard-forks/minio/internal/amztime"
 	"github.com/chainguard-forks/minio/internal/bucket/bandwidth"
 	objectlock "github.com/chainguard-forks/minio/internal/bucket/object/lock"
@@ -53,6 +48,11 @@ import (
 	"github.com/chainguard-forks/minio/internal/kms"
 	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/chainguard-forks/minio/internal/once"
+	"github.com/dustin/go-humanize"
+	"github.com/minio/madmin-go/v3"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/encrypt"
+	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/zeebo/xxh3"
 )

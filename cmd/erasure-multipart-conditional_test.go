@@ -22,8 +22,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/dustin/go-humanize"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/dustin/go-humanize"
 )
 
 // TestNewMultipartUploadConditionalWithReadQuorumFailure tests that conditional

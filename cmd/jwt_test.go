@@ -23,8 +23,8 @@ import (
 	"os"
 	"testing"
 
-	jwtgo "github.com/golang-jwt/jwt/v4"
 	xjwt "github.com/chainguard-forks/minio/internal/jwt"
+	jwtgo "github.com/golang-jwt/jwt/v4"
 )
 
 func getTokenString(accessKey, secretKey string) (string, error) {

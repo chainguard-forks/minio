@@ -29,13 +29,13 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/google/uuid"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/chainguard-forks/minio/internal/bpool"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	"github.com/chainguard-forks/minio/internal/bucket/replication"
 	"github.com/chainguard-forks/minio/internal/config/storageclass"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tinylib/msgp/msgp"
 )
 

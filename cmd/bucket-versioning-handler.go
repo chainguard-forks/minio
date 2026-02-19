@@ -23,10 +23,10 @@ import (
 	"io"
 	"net/http"
 
-	humanize "github.com/dustin/go-humanize"
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/bucket/versioning"
 	"github.com/chainguard-forks/minio/internal/logger"
+	humanize "github.com/dustin/go-humanize"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

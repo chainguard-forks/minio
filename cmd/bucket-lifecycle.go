@@ -31,9 +31,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio-go/v7/pkg/tags"
 	"github.com/chainguard-forks/minio/internal/amztime"
 	sse "github.com/chainguard-forks/minio/internal/bucket/encryption"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
@@ -41,6 +38,9 @@ import (
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/chainguard-forks/minio/internal/s3select"
+	"github.com/google/uuid"
+	"github.com/minio/madmin-go/v3"
+	"github.com/minio/minio-go/v7/pkg/tags"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/zeebo/xxh3"
 )

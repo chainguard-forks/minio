@@ -25,8 +25,8 @@ import (
 	"hash"
 	"io"
 
-	"github.com/minio/highwayhash"
 	"github.com/chainguard-forks/minio/internal/hash/sha256"
+	"github.com/minio/highwayhash"
 	"golang.org/x/crypto/blake2b"
 
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"

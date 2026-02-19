@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
+	"github.com/google/uuid"
 )
 
 func (x xlMetaV2) listFreeVersions(volume, path string) ([]FileInfo, error) {

@@ -28,10 +28,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dustin/go-humanize"
-	"github.com/google/uuid"
 	"github.com/chainguard-forks/minio/internal/bucket/object/lock"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/dustin/go-humanize"
+	"github.com/google/uuid"
 )
 
 func TestParseAndValidateLifecycleConfig(t *testing.T) {

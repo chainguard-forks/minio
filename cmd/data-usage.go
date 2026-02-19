@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/chainguard-forks/minio/internal/cachevalue"
+	jsoniter "github.com/json-iterator/go"
 )
 
 const (

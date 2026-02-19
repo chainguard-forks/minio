@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"io"
 
-	csv "github.com/minio/csvparser"
 	"github.com/chainguard-forks/minio/internal/s3select/json"
 	"github.com/chainguard-forks/minio/internal/s3select/jstream"
 	"github.com/chainguard-forks/minio/internal/s3select/sql"
+	csv "github.com/minio/csvparser"
 	"github.com/minio/simdjson-go"
 )
 

@@ -32,12 +32,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	types "github.com/chainguard-forks/minio/internal/logger/target/loggertypes"
 	"github.com/chainguard-forks/minio/internal/once"
 	"github.com/chainguard-forks/minio/internal/store"
+	jsoniter "github.com/json-iterator/go"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/valyala/bytebufferpool"
 )

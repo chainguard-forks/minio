@@ -23,9 +23,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/color"
 	"github.com/cheggaaa/pb"
 	humanize "github.com/dustin/go-humanize"
-	"github.com/chainguard-forks/minio/internal/color"
 )
 
 // prepareUpdateMessage - prepares the update message, only if a

@@ -27,9 +27,9 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/dustin/go-humanize"
 	"github.com/chainguard-forks/minio/internal/bpool"
 	"github.com/chainguard-forks/minio/internal/disk"
+	"github.com/dustin/go-humanize"
 )
 
 // Block sizes constant.

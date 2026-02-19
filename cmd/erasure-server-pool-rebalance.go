@@ -29,9 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dustin/go-humanize"
-	"github.com/lithammer/shortuuid/v4"
-	"github.com/minio/madmin-go/v3"
 	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	objectlock "github.com/chainguard-forks/minio/internal/bucket/object/lock"
 	"github.com/chainguard-forks/minio/internal/bucket/replication"
@@ -39,6 +36,9 @@ import (
 	"github.com/chainguard-forks/minio/internal/hash"
 	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/dustin/go-humanize"
+	"github.com/lithammer/shortuuid/v4"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/pkg/v3/env"
 	"github.com/minio/pkg/v3/workers"
 )

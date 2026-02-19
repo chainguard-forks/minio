@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"io"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/chainguard-forks/minio/internal/kms"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/secure-io/sio-go"
 	"github.com/secure-io/sio-go/sioutil"
 )
