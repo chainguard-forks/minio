@@ -15,7 +15,7 @@ Build MinIO from source and install it in the chroot directory:
 
 ```sh
 # Build MinIO from source
-go install github.com/minio/minio@latest
+go install github.com/chainguard-forks/minio@latest
 
 # Create the bin directory in your chroot
 mkdir -p /mnt/export/${USER}/bin

@@ -27,8 +27,8 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/klauspost/compress/s2"
-	"github.com/minio/minio/internal/bpool"
-	xioutil "github.com/minio/minio/internal/ioutil"
+	"github.com/chainguard-forks/minio/internal/bpool"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/valyala/bytebufferpool"
 )

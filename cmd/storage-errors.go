@@ -26,7 +26,7 @@ import (
 var errMaxVersionsExceeded = StorageErr("maximum versions exceeded, please delete few versions to proceed")
 
 // errUnexpected - unexpected error, requires manual intervention.
-var errUnexpected = StorageErr("unexpected error, please report this issue at https://github.com/minio/minio/issues")
+var errUnexpected = StorageErr("unexpected error, please report this issue at https://github.com/chainguard-forks/minio/issues")
 
 // errCorruptedFormat - corrupted format.
 var errCorruptedFormat = StorageErr("corrupted format")

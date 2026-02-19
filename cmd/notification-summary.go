@@ -34,7 +34,7 @@ func GetTotalUsableCapacity(diskInfo []madmin.Disk, s StorageInfo) (capacity uin
 	for _, disk := range diskInfo {
 		// Ignore invalid.
 		if disk.PoolIndex < 0 || len(s.Backend.StandardSCData) <= disk.PoolIndex {
-			// https://github.com/minio/minio/issues/16500
+			// https://github.com/chainguard-forks/minio/issues/16500
 			continue
 		}
 		// Ignore parity disks
@@ -58,7 +58,7 @@ func GetTotalUsableCapacityFree(diskInfo []madmin.Disk, s StorageInfo) (capacity
 	for _, disk := range diskInfo {
 		// Ignore invalid.
 		if disk.PoolIndex < 0 || len(s.Backend.StandardSCData) <= disk.PoolIndex {
-			// https://github.com/minio/minio/issues/16500
+			// https://github.com/chainguard-forks/minio/issues/16500
 			continue
 		}
 		// Ignore parity disks

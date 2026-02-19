@@ -20,7 +20,7 @@ package ilm
 import (
 	"strconv"
 
-	"github.com/minio/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/minio/pkg/v3/env"
 )
 

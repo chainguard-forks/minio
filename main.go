@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package main // import "github.com/minio/minio"
+package main // import "github.com/chainguard-forks/minio"
 
 //go:generate go install tool
 
@@ -23,9 +23,9 @@ import (
 	"os"
 
 	// MUST be first import.
-	_ "github.com/minio/minio/internal/init"
+	_ "github.com/chainguard-forks/minio/internal/init"
 
-	minio "github.com/minio/minio/cmd"
+	minio "github.com/chainguard-forks/minio/cmd"
 )
 
 func main() {

@@ -8,7 +8,7 @@ MinIO in distributed mode can help you setup a highly-available storage system w
 
 ### Data protection
 
-Distributed MinIO provides protection against multiple node/drive failures and [bit rot](https://github.com/minio/minio/blob/master/docs/erasure/README.md#what-is-bit-rot-protection) using [erasure code](https://docs.min.io/community/minio-object-store/operations/concepts/erasure-coding.html). As the minimum drives required for distributed MinIO is 2 (same as minimum drives required for erasure coding), erasure code automatically kicks in as you launch distributed MinIO.
+Distributed MinIO provides protection against multiple node/drive failures and [bit rot](https://github.com/chainguard-forks/minio/blob/master/docs/erasure/README.md#what-is-bit-rot-protection) using [erasure code](https://docs.min.io/community/minio-object-store/operations/concepts/erasure-coding.html). As the minimum drives required for distributed MinIO is 2 (same as minimum drives required for erasure coding), erasure code automatically kicks in as you launch distributed MinIO.
 
 If one or more drives are offline at the start of a PutObject or NewMultipartUpload operation the object will have additional data protection bits added automatically to provide additional safety for these objects.
 
@@ -18,7 +18,7 @@ A stand-alone MinIO server would go down if the server hosting the drives goes o
 
 For example, an 16-server distributed setup with 200 drives per node would continue serving files, up to 4 servers can be offline in default configuration i.e around 800 drives down MinIO would continue to read and write objects.
 
-Refer to sizing guide for more understanding on default values chosen depending on your erasure stripe size [here](https://github.com/minio/minio/blob/master/docs/distributed/SIZING.md). Parity settings can be changed using [storage classes](https://github.com/minio/minio/tree/master/docs/erasure/storage-class).
+Refer to sizing guide for more understanding on default values chosen depending on your erasure stripe size [here](https://github.com/chainguard-forks/minio/blob/master/docs/distributed/SIZING.md). Parity settings can be changed using [storage classes](https://github.com/chainguard-forks/minio/tree/master/docs/erasure/storage-class).
 
 ### Consistency Guarantees
 
@@ -63,7 +63,7 @@ To start a distributed MinIO instance, you just need to pass drive locations as 
 
 Example 1: Start distributed MinIO instance on n nodes with m drives each mounted at `/export1` to `/exportm` (pictured below), by running this command on all the n nodes:
 
-![Distributed MinIO, n nodes with m drives each](https://github.com/minio/minio/blob/master/docs/screenshots/Architecture-diagram_distributed_nm.png?raw=true)
+![Distributed MinIO, n nodes with m drives each](https://github.com/chainguard-forks/minio/blob/master/docs/screenshots/Architecture-diagram_distributed_nm.png?raw=true)
 
 ### GNU/Linux and macOS
 

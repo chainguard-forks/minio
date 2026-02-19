@@ -17,7 +17,7 @@
 
 package browser
 
-import "github.com/minio/minio/internal/config"
+import "github.com/chainguard-forks/minio/internal/config"
 
 // Help template for browser feature.
 var (

@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- Prometheus and MinIO configured as explained in [document here](https://github.com/minio/minio/blob/master/docs/metrics/prometheus/README.md).
+- Prometheus and MinIO configured as explained in [document here](https://github.com/chainguard-forks/minio/blob/master/docs/metrics/prometheus/README.md).
 - Grafana installed as explained [here](https://grafana.com/grafana/download).
 
 ## MinIO Grafana Dashboard

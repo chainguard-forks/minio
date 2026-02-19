@@ -23,7 +23,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/minio/madmin-go/v3/kernel"
-	"github.com/minio/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/pkg/v3/sys"
 )
 

@@ -22,14 +22,14 @@ import (
 	"context"
 	"testing"
 
-	xhttp "github.com/minio/minio/internal/http"
+	xhttp "github.com/chainguard-forks/minio/internal/http"
 )
 
 // TestPutObjectConditionalWithReadQuorumFailure tests that conditional
 // PutObject operations (with if-match/if-none-match) behave correctly when read quorum
 // cannot be reached.
 //
-// Related to: https://github.com/minio/minio/issues/21603
+// Related to: https://github.com/chainguard-forks/minio/issues/21603
 //
 // Should return an error when read quorum cannot
 // be reached, as we cannot reliably determine if the precondition is met.

@@ -237,7 +237,7 @@ MinIO can connect to other servers, including MinIO nodes or other server types 
 
 ## Explore Further
 
-* [TLS Configuration for MinIO server on Kubernetes](https://github.com/minio/minio/tree/master/docs/tls/kubernetes)
+* [TLS Configuration for MinIO server on Kubernetes](https://github.com/chainguard-forks/minio/tree/master/docs/tls/kubernetes)
 * [MinIO Client Complete Guide](https://docs.min.io/community/minio-object-store/reference/minio-mc.html)
 * [MinIO Network Encryption Overview](https://docs.min.io/community/minio-object-store/operations/network-encryption.html)
 * [Generate Let's Encrypt Certificate](https://docs.min.io/community/minio-object-store/integrations/generate-lets-encrypt-certificate-using-certbot-for-minio.html)

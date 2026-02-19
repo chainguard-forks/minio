@@ -38,7 +38,7 @@ For optimal production setup MinIO recommends Linux kernel version 4.x and later
 
 ## List of Amazon S3 APIs not supported on MinIO
 
-We found the following APIs to be redundant or less useful outside of AWS S3. If you have a different view on any of the APIs we missed, please consider opening a [GitHub issue](https://github.com/minio/minio/issues) with relevant details on why MinIO must implement them.
+We found the following APIs to be redundant or less useful outside of AWS S3. If you have a different view on any of the APIs we missed, please consider opening a [GitHub issue](https://github.com/chainguard-forks/minio/issues) with relevant details on why MinIO must implement them.
 
 ### List of Amazon S3 Bucket APIs not supported on MinIO
 

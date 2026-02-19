@@ -35,7 +35,7 @@ import (
 
 	"github.com/minio/kms-go/kms"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/hash/sha256"
+	"github.com/chainguard-forks/minio/internal/hash/sha256"
 )
 
 // ParseSecretKey parses s as <key-id>:<base64> and returns a

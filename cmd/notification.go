@@ -33,13 +33,13 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/klauspost/compress/zip"
 	"github.com/minio/madmin-go/v3"
-	xioutil "github.com/minio/minio/internal/ioutil"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/minio/pkg/v3/workers"
 
-	"github.com/minio/minio/internal/bucket/bandwidth"
-	"github.com/minio/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/bucket/bandwidth"
+	"github.com/chainguard-forks/minio/internal/logger"
 )
 
 // This file contains peer related notifications. For sending notifications to

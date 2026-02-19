@@ -24,7 +24,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/minio/minio/internal/dsync"
+	"github.com/chainguard-forks/minio/internal/dsync"
 )
 
 // Helper function to create a lock server for testing

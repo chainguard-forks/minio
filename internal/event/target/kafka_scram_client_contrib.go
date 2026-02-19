@@ -23,7 +23,7 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/xdg/scram"
 
-	"github.com/minio/minio/internal/hash/sha256"
+	"github.com/chainguard-forks/minio/internal/hash/sha256"
 )
 
 func initScramClient(args KafkaArgs, config *sarama.Config) {

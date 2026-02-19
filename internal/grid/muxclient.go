@@ -26,7 +26,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	xioutil "github.com/minio/minio/internal/ioutil"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/zeebo/xxh3"
 )
 

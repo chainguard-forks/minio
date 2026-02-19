@@ -1,6 +1,6 @@
 # ILM Tiering Design [![slack](https://slack.min.io/slack?type=svg)](https://slack.min.io) [![Docker Pulls](https://img.shields.io/docker/pulls/minio/minio.svg?maxAge=604800)](https://hub.docker.com/r/minio/minio/)
 
-Lifecycle transition functionality provided in [bucket lifecycle guide](https://github.com/minio/minio/master/docs/bucket/lifecycle/README.md) allows tiering of content from MinIO object store to public clouds or other MinIO clusters.
+Lifecycle transition functionality provided in [bucket lifecycle guide](https://github.com/chainguard-forks/minio/master/docs/bucket/lifecycle/README.md) allows tiering of content from MinIO object store to public clouds or other MinIO clusters.
 
 Transition tiers can be added to MinIO using `mc admin tier add` command to associate a `gcs`, `s3` or `azure` bucket or prefix path on a bucket to the tier name.
 Lifecycle transition rules can be applied to buckets (both versioned and un-versioned) by specifying the tier name defined above as the transition storage class for the lifecycle rule.

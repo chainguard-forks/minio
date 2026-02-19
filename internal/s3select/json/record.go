@@ -27,8 +27,8 @@ import (
 	"strings"
 
 	csv "github.com/minio/csvparser"
-	"github.com/minio/minio/internal/s3select/jstream"
-	"github.com/minio/minio/internal/s3select/sql"
+	"github.com/chainguard-forks/minio/internal/s3select/jstream"
+	"github.com/chainguard-forks/minio/internal/s3select/sql"
 )
 
 // RawJSON is a byte-slice that contains valid JSON

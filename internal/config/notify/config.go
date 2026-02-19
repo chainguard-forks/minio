@@ -18,7 +18,7 @@
 package notify
 
 import (
-	"github.com/minio/minio/internal/event/target"
+	"github.com/chainguard-forks/minio/internal/event/target"
 )
 
 // Config - notification target configuration structure, holds

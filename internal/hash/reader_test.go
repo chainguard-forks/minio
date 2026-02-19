@@ -25,7 +25,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/minio/minio/internal/ioutil"
+	"github.com/chainguard-forks/minio/internal/ioutil"
 )
 
 // Tests functions like Size(), MD5*(), SHA256*()

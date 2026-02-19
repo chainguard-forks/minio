@@ -111,7 +111,7 @@ func s3EncodeName(name, encodingType string) string {
 func getHandlerName(f http.HandlerFunc, cmdType string) string {
 	name := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 
-	packageName := fmt.Sprintf("github.com/minio/minio/cmd.%s.", cmdType)
+	packageName := fmt.Sprintf("github.com/chainguard-forks/minio/cmd.%s.", cmdType)
 	name = strings.TrimPrefix(name, packageName)
 	name = strings.TrimSuffix(name, "Handler-fm")
 	name = strings.TrimSuffix(name, "-fm")
