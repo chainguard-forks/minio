@@ -27,9 +27,9 @@ import (
 	"sync"
 	"time"
 
+	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/dustin/go-humanize"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
 )
 
 var printEndpointError = func() func(Endpoint, error, bool) {
@@ -116,7 +116,7 @@ func bgFormatErasureCleanupTmp(diskPath string) {
 // migration failed to capture '.This' field properly which indicates
 // the disk UUID association. Below error message is returned when
 // we see this situation in format.json, for more info refer
-// https://github.com/minio/minio/issues/5667
+// https://github.com/chainguard-forks/minio/issues/5667
 var errErasureV3ThisEmpty = fmt.Errorf("Erasure format version 3 has This field empty")
 
 // isServerResolvable - checks if the endpoint is resolvable

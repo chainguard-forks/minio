@@ -21,7 +21,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 
-	"github.com/minio/minio/internal/hash/sha256"
+	"github.com/chainguard-forks/minio/internal/hash/sha256"
 )
 
 // getSHA256Hash returns SHA-256 hash in hex encoding of given data.

@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/minio/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/logger"
 	ftp "goftp.io/server/v2"
 )
 

@@ -23,10 +23,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/chainguard-forks/minio/internal/auth"
+	"github.com/chainguard-forks/minio/internal/config"
 	"github.com/minio/kms-go/kes"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/config"
 	"github.com/minio/pkg/v3/policy"
 )
 

@@ -22,11 +22,11 @@ import (
 	"io"
 	"time"
 
+	jsonfmt "github.com/chainguard-forks/minio/internal/s3select/json"
+	"github.com/chainguard-forks/minio/internal/s3select/jstream"
+	"github.com/chainguard-forks/minio/internal/s3select/sql"
 	parquetgo "github.com/fraugster/parquet-go"
 	parquettypes "github.com/fraugster/parquet-go/parquet"
-	jsonfmt "github.com/minio/minio/internal/s3select/json"
-	"github.com/minio/minio/internal/s3select/jstream"
-	"github.com/minio/minio/internal/s3select/sql"
 )
 
 // Reader implements reading records from parquet input.

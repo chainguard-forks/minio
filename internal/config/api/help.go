@@ -17,7 +17,7 @@
 
 package api
 
-import "github.com/minio/minio/internal/config"
+import "github.com/chainguard-forks/minio/internal/config"
 
 var (
 	defaultHelpPostfix = func(key string) string {

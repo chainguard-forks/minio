@@ -31,13 +31,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/event"
+	xhttp "github.com/chainguard-forks/minio/internal/http"
+	"github.com/chainguard-forks/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/once"
+	"github.com/chainguard-forks/minio/internal/store"
 	elasticsearch7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/minio/highwayhash"
-	"github.com/minio/minio/internal/event"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/once"
-	"github.com/minio/minio/internal/store"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/pkg/errors"
 )

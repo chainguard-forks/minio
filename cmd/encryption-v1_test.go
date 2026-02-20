@@ -23,10 +23,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/chainguard-forks/minio/internal/crypto"
+	xhttp "github.com/chainguard-forks/minio/internal/http"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/minio/minio-go/v7/pkg/encrypt"
-	"github.com/minio/minio/internal/crypto"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/sio"
 )
 

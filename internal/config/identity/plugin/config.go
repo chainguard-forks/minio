@@ -31,9 +31,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/minio/minio/internal/arn"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/arn"
+	"github.com/chainguard-forks/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/pkg/v3/env"
 	xnet "github.com/minio/pkg/v3/net"
 )

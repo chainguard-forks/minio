@@ -20,7 +20,7 @@ minio server --address :9002 /data/tenant2
 minio server --address :9003 /data/tenant3
 ```
 
-![Example-1](https://github.com/minio/minio/blob/master/docs/screenshots/Example-1.jpg?raw=true)
+![Example-1](https://github.com/chainguard-forks/minio/blob/master/docs/screenshots/Example-1.jpg?raw=true)
 
 ### 1.2 Host Multiple Tenants on Multiple Drives (Erasure Code)
 
@@ -32,7 +32,7 @@ minio server --address :9002 /disk{1...4}/data/tenant2
 minio server --address :9003 /disk{1...4}/data/tenant3
 ```
 
-![Example-2](https://github.com/minio/minio/blob/master/docs/screenshots/Example-2.jpg?raw=true)
+![Example-2](https://github.com/chainguard-forks/minio/blob/master/docs/screenshots/Example-2.jpg?raw=true)
 
 ## 2. Distributed Deployment
 
@@ -58,7 +58,7 @@ minio server --address :9003 http://192.168.10.1{1...4}/data/tenant3
 
 **Note:** Execute the commands on all 4 nodes.
 
-![Example-3](https://github.com/minio/minio/blob/master/docs/screenshots/Example-3.jpg?raw=true)
+![Example-3](https://github.com/chainguard-forks/minio/blob/master/docs/screenshots/Example-3.jpg?raw=true)
 
 **Note**: On distributed systems, root credentials are recommend to be defined by exporting the `MINIO_ROOT_USER` and  `MINIO_ROOT_PASSWORD` environment variables. If no value is set MinIO setup will assume `minioadmin/minioadmin` as default credentials. If a domain is required, it must be specified by defining and exporting the `MINIO_DOMAIN` environment variable.
 

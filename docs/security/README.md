@@ -83,7 +83,7 @@ server only assumes that the KMS provides two services:
 
 - `DecryptKey`: Takes a key ID and an encrypted data key and returns the plain data key - the decryption of the encrypted data key using the master key referenced by the key ID - on success or an error otherwise.
 
-More details about supported KMS implementations and configuration can be found at the [KMS guide](https://github.com/minio/minio/blob/master/docs/kms/README.md).
+More details about supported KMS implementations and configuration can be found at the [KMS guide](https://github.com/chainguard-forks/minio/blob/master/docs/kms/README.md).
 
 The MinIO server requests a new data key from the KMS for each uploaded object and uses that data key as EK. Additionally it stores the encrypted form of the data key and the master key ID as part of the object metadata. The plain data only resides in RAM during the en/decryption process. The MinIO server does not store any SSE-related key at the KMS. Instead the KMS is treated as trusted component that performs key sealing/unsealing operations to build a key hierarchy:
 

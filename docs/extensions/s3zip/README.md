@@ -23,9 +23,9 @@ All properties except the file size are tied to the zip file. This means that mo
 
 ## Code Examples
 
-[Using minio-go library](https://github.com/minio/minio/blob/master/docs/extensions/s3zip/examples/minio-go/main.go)
-[Using AWS JS SDK v2](https://github.com/minio/minio/blob/master/docs/extensions/s3zip/examples/aws-js/main.js)
-[Using boto3](https://github.com/minio/minio/blob/master/docs/extensions/s3zip/examples/boto3/main.py)
+[Using minio-go library](https://github.com/chainguard-forks/minio/blob/master/docs/extensions/s3zip/examples/minio-go/main.go)
+[Using AWS JS SDK v2](https://github.com/chainguard-forks/minio/blob/master/docs/extensions/s3zip/examples/aws-js/main.js)
+[Using boto3](https://github.com/chainguard-forks/minio/blob/master/docs/extensions/s3zip/examples/boto3/main.py)
 
 ## Requirements and limits
 

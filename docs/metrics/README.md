@@ -9,7 +9,7 @@ MinIO server has two healthcheck related un-authenticated endpoints, a liveness 
 - Liveness probe available at `/minio/health/live`
 - Cluster probe available at `/minio/health/cluster`
 
-Read more on how to use these endpoints in [MinIO healthcheck guide](https://github.com/minio/minio/blob/master/docs/metrics/healthcheck/README.md).
+Read more on how to use these endpoints in [MinIO healthcheck guide](https://github.com/chainguard-forks/minio/blob/master/docs/metrics/healthcheck/README.md).
 
 ## Prometheus Probe
 
@@ -25,7 +25,7 @@ The additional bucket specific metrics which include additional go metrics or pr
 The additional resource specific metrics which include additional go metrics or process metrics are exposed at
 `<Address for MinIO Node>/minio/v2/metrics/resource`.
 
-To use this endpoint, setup Prometheus to scrape data from this endpoint. Read more on how to configure and use Prometheus to monitor MinIO server in [How to monitor MinIO server with Prometheus](https://github.com/minio/minio/blob/master/docs/metrics/prometheus/README.md).
+To use this endpoint, setup Prometheus to scrape data from this endpoint. Read more on how to configure and use Prometheus to monitor MinIO server in [How to monitor MinIO server with Prometheus](https://github.com/chainguard-forks/minio/blob/master/docs/metrics/prometheus/README.md).
 
 ### **Deprecated metrics monitoring**
 

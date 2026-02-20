@@ -42,7 +42,7 @@ Therefore, the metadata is wrapped as a binary array for easy skipping.
 - LegacyObjectType (preserves existing deployments and older xl.json format)
 - DeleteMarker (a versionId to capture the DELETE sequences implemented primarily for AWS spec compatibility)
 
-A sample msgpack-JSON `xl.meta`, you can debug the content inside `xl.meta` using [xl-meta.go](https://github.com/minio/minio/tree/master/docs/debugging#decoding-metadata) program.
+A sample msgpack-JSON `xl.meta`, you can debug the content inside `xl.meta` using [xl-meta.go](https://github.com/chainguard-forks/minio/tree/master/docs/debugging#decoding-metadata) program.
 
 ```json
 {

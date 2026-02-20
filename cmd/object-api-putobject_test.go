@@ -27,9 +27,9 @@ import (
 	"path"
 	"testing"
 
+	"github.com/chainguard-forks/minio/internal/hash"
+	"github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/ioutil"
 )
 
 func md5Header(data []byte) map[string]string {

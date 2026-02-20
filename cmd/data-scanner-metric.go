@@ -24,8 +24,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/bucket/lifecycle"
 )
 
 //go:generate stringer -type=scannerMetric -trimprefix=scannerMetric $GOFILE

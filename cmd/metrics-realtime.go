@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/disk"
+	"github.com/chainguard-forks/minio/internal/net"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/disk"
-	"github.com/minio/minio/internal/net"
 	c "github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/load"
 )

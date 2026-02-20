@@ -7,7 +7,7 @@ MinIO supports encrypting config, IAM assets with KMS provided keys. If the KMS 
 MinIO supports two ways of encrypting IAM and configuration data.
 You can either use KES - together with an external KMS - or, much simpler,
 set the env. variable `MINIO_KMS_SECRET_KEY` and start/restart the MinIO server. For more details about KES and how
-to set it up refer to our [KMS Guide](https://github.com/minio/minio/blob/master/docs/kms/README.md).
+to set it up refer to our [KMS Guide](https://github.com/chainguard-forks/minio/blob/master/docs/kms/README.md).
 
 Instead of configuring an external KMS you can start with a single key by
 setting the env. variable `MINIO_KMS_SECRET_KEY`. It expects the following
@@ -45,7 +45,7 @@ kes key create my-minio-key OSMM+vkKUTCvQs9YL/CVMIMt43HFhkUpqJxTmGl6rYw=
 
 - For instructions on setting up KES, see the [KES Getting Started guide](https://github.com/minio/kes/wiki/Getting-Started)
 
-- For instructions on using KES for encrypting the MinIO backend, follow the [KMS Quick Start](https://github.com/minio/minio/tree/master/docs/kms). The SSE-S3 configuration setup also supports MinIO KMS backend encryption.
+- For instructions on using KES for encrypting the MinIO backend, follow the [KMS Quick Start](https://github.com/chainguard-forks/minio/tree/master/docs/kms). The SSE-S3 configuration setup also supports MinIO KMS backend encryption.
 
 ## FAQ
 

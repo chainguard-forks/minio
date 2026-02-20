@@ -18,7 +18,7 @@
 package storageclass
 
 import (
-	"github.com/minio/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/config"
 )
 
 // SetStorageClass - One time migration code needed, for migrating from older config to new for StorageClass.

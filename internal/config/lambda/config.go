@@ -17,7 +17,7 @@
 
 package lambda
 
-import "github.com/minio/minio/internal/event/target"
+import "github.com/chainguard-forks/minio/internal/event/target"
 
 // Config - lambda target configuration structure, holds
 // information about various lambda targets.

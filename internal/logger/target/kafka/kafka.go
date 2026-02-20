@@ -34,10 +34,10 @@ import (
 	"github.com/IBM/sarama"
 	saramatls "github.com/IBM/sarama/tools/tls"
 
-	xioutil "github.com/minio/minio/internal/ioutil"
-	types "github.com/minio/minio/internal/logger/target/loggertypes"
-	"github.com/minio/minio/internal/once"
-	"github.com/minio/minio/internal/store"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
+	types "github.com/chainguard-forks/minio/internal/logger/target/loggertypes"
+	"github.com/chainguard-forks/minio/internal/once"
+	"github.com/chainguard-forks/minio/internal/store"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

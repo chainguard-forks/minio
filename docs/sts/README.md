@@ -15,17 +15,17 @@ Following are advantages for using temporary credentials:
 
 | AuthN                                                                                  | Description                                                                                                                                   |
 | :----------------------                                                                | ------------------------------------------                                                                                                    |
-| [**WebIdentity**](https://github.com/minio/minio/blob/master/docs/sts/web-identity.md) | Let users request temporary credentials using any OpenID(OIDC) compatible web identity providers such as KeyCloak, Dex, Facebook, Google etc. |
-| [**AD/LDAP**](https://github.com/minio/minio/blob/master/docs/sts/ldap.md)             | Let AD/LDAP users request temporary credentials using AD/LDAP username and password.                                                          |
-| [**AssumeRole**](https://github.com/minio/minio/blob/master/docs/sts/assume-role.md)   | Let MinIO users request temporary credentials using user access and secret keys.                                                              |
+| [**WebIdentity**](https://github.com/chainguard-forks/minio/blob/master/docs/sts/web-identity.md) | Let users request temporary credentials using any OpenID(OIDC) compatible web identity providers such as KeyCloak, Dex, Facebook, Google etc. |
+| [**AD/LDAP**](https://github.com/chainguard-forks/minio/blob/master/docs/sts/ldap.md)             | Let AD/LDAP users request temporary credentials using AD/LDAP username and password.                                                          |
+| [**AssumeRole**](https://github.com/chainguard-forks/minio/blob/master/docs/sts/assume-role.md)   | Let MinIO users request temporary credentials using user access and secret keys.                                                              |
 
 ### Understanding JWT Claims
 
 > NOTE: JWT claims are only meant for WebIdentity and ClientGrants.
 > AssumeRole or LDAP users can skip the entire portion and directly visit one of the links below.
 >
-> - [**AssumeRole**](https://github.com/minio/minio/blob/master/docs/sts/assume-role.md)
-> - [**AD/LDAP**](https://github.com/minio/minio/blob/master/docs/sts/ldap.md)
+> - [**AssumeRole**](https://github.com/chainguard-forks/minio/blob/master/docs/sts/assume-role.md)
+> - [**AD/LDAP**](https://github.com/chainguard-forks/minio/blob/master/docs/sts/ldap.md)
 
 The id_token received is a signed JSON Web Token (JWT). Use a JWT decoder to decode the id_token to access the payload of the token that includes following JWT claims, `policy` claim is mandatory and should be present as part of your JWT claim. Without this claim the generated credentials will not have access to any resources on the server, using these credentials application would receive 'Access Denied' errors.
 
@@ -37,12 +37,12 @@ The id_token received is a signed JSON Web Token (JWT). Use a JWT decoder to dec
 
 In this document we will explain in detail on how to configure all the prerequisites.
 
-> NOTE: If you are interested in AssumeRole API only, skip to [here](https://github.com/minio/minio/blob/master/docs/sts/assume-role.md)
+> NOTE: If you are interested in AssumeRole API only, skip to [here](https://github.com/chainguard-forks/minio/blob/master/docs/sts/assume-role.md)
 
 ### Prerequisites
 
-- [Configuring keycloak](https://github.com/minio/minio/blob/master/docs/sts/keycloak.md) or [Configuring Casdoor](https://github.com/minio/minio/blob/master/docs/sts/casdoor.md)
-- [Configuring etcd](https://github.com/minio/minio/blob/master/docs/sts/etcd.md)
+- [Configuring keycloak](https://github.com/chainguard-forks/minio/blob/master/docs/sts/keycloak.md) or [Configuring Casdoor](https://github.com/chainguard-forks/minio/blob/master/docs/sts/casdoor.md)
+- [Configuring etcd](https://github.com/chainguard-forks/minio/blob/master/docs/sts/etcd.md)
 
 ### Setup MinIO with Identity Provider
 

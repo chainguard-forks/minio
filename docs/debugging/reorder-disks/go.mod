@@ -1,4 +1,4 @@
-module github.com/minio/minio/docs/debugging/reorder-disks
+module github.com/chainguard-forks/minio/docs/debugging/reorder-disks
 
 go 1.21
 

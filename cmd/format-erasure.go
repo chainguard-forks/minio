@@ -26,12 +26,12 @@ import (
 	"os"
 	"sync"
 
+	"github.com/chainguard-forks/minio/internal/color"
+	"github.com/chainguard-forks/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/config/storageclass"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/color"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/config/storageclass"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/sync/errgroup"
 )
 

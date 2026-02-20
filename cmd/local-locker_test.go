@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/dsync"
 	"github.com/google/uuid"
-	"github.com/minio/minio/internal/dsync"
 )
 
 func TestLocalLockerExpire(t *testing.T) {

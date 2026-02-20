@@ -28,7 +28,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/minio/minio/internal/auth"
+	"github.com/chainguard-forks/minio/internal/auth"
 	"github.com/minio/pkg/v3/policy"
 	"github.com/minio/pkg/v3/policy/condition"
 )

@@ -25,9 +25,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/chainguard-forks/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/env"
 )
 

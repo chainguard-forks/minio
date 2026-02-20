@@ -24,9 +24,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/chainguard-forks/minio/internal/s3select/json"
+	"github.com/chainguard-forks/minio/internal/s3select/sql"
 	"github.com/klauspost/compress/zstd"
-	"github.com/minio/minio/internal/s3select/json"
-	"github.com/minio/minio/internal/s3select/sql"
 	"github.com/minio/simdjson-go"
 )
 

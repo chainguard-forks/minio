@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	xioutil "github.com/minio/minio/internal/ioutil"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/minio/pkg/v3/console"
 )
 

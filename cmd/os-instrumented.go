@@ -23,9 +23,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/disk"
+	ioutilx "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/disk"
-	ioutilx "github.com/minio/minio/internal/ioutil"
 )
 
 //go:generate stringer -type=osMetric -trimprefix=osMetric $GOFILE

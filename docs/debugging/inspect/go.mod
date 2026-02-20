@@ -1,4 +1,4 @@
-module github.com/minio/minio/docs/debugging/inspect
+module github.com/chainguard-forks/minio/docs/debugging/inspect
 
 go 1.24.0
 

@@ -10,7 +10,7 @@ In this document we will explain in detail on how to configure multiple users.
 
 - Install mc - [MinIO Client Quickstart Guide](https://docs.min.io/community/minio-object-store/reference/minio-mc.html#quickstart)
 - Install MinIO - [MinIO Quickstart Guide](https://docs.min.io/community/minio-object-store/operations/deployments/baremetal-deploy-minio-on-redhat-linux.html)
-- Configure etcd - [Etcd V3 Quickstart Guide](https://github.com/minio/minio/blob/master/docs/sts/etcd.md)
+- Configure etcd - [Etcd V3 Quickstart Guide](https://github.com/chainguard-forks/minio/blob/master/docs/sts/etcd.md)
 
 ### 2. Create a new user with canned policy
 

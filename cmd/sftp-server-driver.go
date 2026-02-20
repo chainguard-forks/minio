@@ -30,10 +30,10 @@ import (
 	"sync"
 	"time"
 
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	xioutil "github.com/minio/minio/internal/ioutil"
 	"github.com/minio/pkg/v3/mimedb"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"

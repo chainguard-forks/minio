@@ -34,11 +34,11 @@ import (
 	"testing"
 	"time"
 
+	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/dustin/go-humanize"
 	jwtgo "github.com/golang-jwt/jwt/v4"
 	"github.com/minio/minio-go/v7/pkg/set"
 	"github.com/minio/minio-go/v7/pkg/signer"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/pkg/v3/policy"
 )
 
@@ -2128,7 +2128,7 @@ func (s *TestSuiteCommon) TestGetObjectLarge10MiB(c *check) {
 	1234567890,1234567890,1234567890,1234567890,1234567890,123"`
 	// Create 10MiB content where each line contains 1024 characters.
 	for i := range 10 * 1024 {
-		buffer.WriteString(fmt.Sprintf("[%05d] %s\n", i, line))
+		fmt.Fprintf(&buffer, "[%05d] %s\n", i, line)
 	}
 	putContent := buffer.String()
 
@@ -2190,7 +2190,7 @@ func (s *TestSuiteCommon) TestGetObjectLarge11MiB(c *check) {
 	1234567890,1234567890,1234567890,123`
 	// Create 11MiB content where each line contains 1024 characters.
 	for i := range 11 * 1024 {
-		buffer.WriteString(fmt.Sprintf("[%05d] %s\n", i, line))
+		fmt.Fprintf(&buffer, "[%05d] %s\n", i, line)
 	}
 	putMD5 := getMD5Hash(buffer.Bytes())
 
@@ -2341,7 +2341,7 @@ func (s *TestSuiteCommon) TestGetPartialObjectLarge11MiB(c *check) {
 	// Create 11MiB content where each line contains 1024
 	// characters.
 	for i := range 11 * 1024 {
-		buffer.WriteString(fmt.Sprintf("[%05d] %s\n", i, line))
+		fmt.Fprintf(&buffer, "[%05d] %s\n", i, line)
 	}
 	putContent := buffer.String()
 
@@ -2407,7 +2407,7 @@ func (s *TestSuiteCommon) TestGetPartialObjectLarge10MiB(c *check) {
 	1234567890,1234567890,1234567890,123`
 	// Create 10MiB content where each line contains 1024 characters.
 	for i := range 10 * 1024 {
-		buffer.WriteString(fmt.Sprintf("[%05d] %s\n", i, line))
+		fmt.Fprintf(&buffer, "[%05d] %s\n", i, line)
 	}
 
 	putContent := buffer.String()

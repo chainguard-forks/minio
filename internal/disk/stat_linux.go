@@ -63,7 +63,7 @@ func GetInfo(path string, firstTime bool) (info Info, err error) {
 	info.Minor = unix.Minor(devID)
 
 	// Check for overflows.
-	// https://github.com/minio/minio/issues/8035
+	// https://github.com/chainguard-forks/minio/issues/8035
 	// XFS can show wrong values at times error out
 	// in such scenarios.
 	if info.Free > info.Total {

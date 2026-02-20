@@ -27,10 +27,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chainguard-forks/minio/internal/config/storageclass"
+	"github.com/chainguard-forks/minio/internal/hash"
+	"github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/config/storageclass"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/ioutil"
 )
 
 // Wrapper for calling NewMultipartUpload tests for both Erasure multiple disks and single node setup.

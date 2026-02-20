@@ -33,13 +33,13 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/bucket/lifecycle"
+	"github.com/chainguard-forks/minio/internal/bucket/object/lock"
+	"github.com/chainguard-forks/minio/internal/bucket/versioning"
+	"github.com/chainguard-forks/minio/internal/color"
+	"github.com/chainguard-forks/minio/internal/hash"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/minio/minio/internal/bucket/lifecycle"
-	"github.com/minio/minio/internal/bucket/object/lock"
-	"github.com/minio/minio/internal/bucket/versioning"
-	"github.com/minio/minio/internal/color"
-	"github.com/minio/minio/internal/hash"
-	xioutil "github.com/minio/minio/internal/ioutil"
 	"github.com/minio/pkg/v3/console"
 )
 

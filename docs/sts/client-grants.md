@@ -95,7 +95,7 @@ minio server /mnt/export
 ```
 
 Testing with an example
-> Obtaining client ID and secrets follow [Keycloak configuring documentation](https://github.com/minio/minio/blob/master/docs/sts/keycloak.md)
+> Obtaining client ID and secrets follow [Keycloak configuring documentation](https://github.com/chainguard-forks/minio/blob/master/docs/sts/keycloak.md)
 
 ```
 $ go run client-grants.go -cid PoEgXP6uVO45IsENRngDXj5Au5Ya -csec eKsw6z8CtOJVBtrOWvhRWL4TUCga

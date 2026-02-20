@@ -27,8 +27,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/grid"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/grid"
 	"github.com/minio/pkg/v3/sync/errgroup"
 )
 

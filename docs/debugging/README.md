@@ -75,7 +75,7 @@ Metadata is stored in `xl.meta` files for erasure coded objects. Each disk in th
 To install, [Go](https://golang.org/dl/) must be installed. Once installed, execute this to install the binary:
 
 ```bash
-go install github.com/minio/minio/docs/debugging/xl-meta@latest
+go install github.com/chainguard-forks/minio/docs/debugging/xl-meta@latest
 ```
 
 ### Using xl-meta
@@ -123,7 +123,7 @@ To install, [Go](https://golang.org/dl/) must be installed.
 Once installed, execute this to install the binary:
 
 ```bash
-go install github.com/minio/minio/docs/debugging/inspect@latest
+go install github.com/chainguard-forks/minio/docs/debugging/inspect@latest
 ```
 
 ### Usage

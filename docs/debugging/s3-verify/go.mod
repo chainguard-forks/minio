@@ -1,4 +1,4 @@
-module github.com/minio/minio/docs/debugging/s3-verify
+module github.com/chainguard-forks/minio/docs/debugging/s3-verify
 
 go 1.24.0
 

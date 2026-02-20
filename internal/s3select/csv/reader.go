@@ -26,9 +26,9 @@ import (
 	"sync"
 	"unicode/utf8"
 
+	"github.com/chainguard-forks/minio/internal/bpool"
+	"github.com/chainguard-forks/minio/internal/s3select/sql"
 	csv "github.com/minio/csvparser"
-	"github.com/minio/minio/internal/bpool"
-	"github.com/minio/minio/internal/s3select/sql"
 )
 
 // Reader - CSV record reader for S3Select.

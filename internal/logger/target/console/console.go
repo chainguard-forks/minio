@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/chainguard-forks/minio/internal/color"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/madmin-go/v3/logger/log"
-	"github.com/minio/minio/internal/color"
-	"github.com/minio/minio/internal/logger"
 )
 
 // Target implements loggerTarget to send log

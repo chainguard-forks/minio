@@ -20,7 +20,7 @@ package cmd
 import (
 	"context"
 
-	"github.com/minio/minio/internal/rest"
+	"github.com/chainguard-forks/minio/internal/rest"
 )
 
 const (

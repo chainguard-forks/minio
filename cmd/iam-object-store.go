@@ -29,12 +29,12 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/chainguard-forks/minio/internal/config"
+	xioutil "github.com/chainguard-forks/minio/internal/ioutil"
+	"github.com/chainguard-forks/minio/internal/kms"
+	"github.com/chainguard-forks/minio/internal/logger"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/config"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/kms"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/puzpuzpuz/xsync/v3"
 )
@@ -576,7 +576,7 @@ func (iamOS *IAMObjectStore) loadAllFromObjStore(ctx context.Context, cache *iam
 	if took := time.Since(listStartTime); took > maxIAMLoadOpTime {
 		var s strings.Builder
 		for k, v := range listedConfigItems {
-			s.WriteString(fmt.Sprintf("    %s: %d items\n", k, len(v)))
+			fmt.Fprintf(&s, "    %s: %d items\n", k, len(v))
 		}
 		logger.Info("listAllIAMConfigItems took %.2fs with contents:\n%s", took.Seconds(), s.String())
 	}

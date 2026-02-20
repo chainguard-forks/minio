@@ -28,9 +28,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/grid"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/grid"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/puzpuzpuz/xsync/v3"
 )

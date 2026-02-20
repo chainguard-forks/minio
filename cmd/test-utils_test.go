@@ -58,13 +58,13 @@ import (
 
 	"github.com/fatih/color"
 
+	"github.com/chainguard-forks/minio/internal/auth"
+	"github.com/chainguard-forks/minio/internal/config"
+	"github.com/chainguard-forks/minio/internal/crypto"
+	"github.com/chainguard-forks/minio/internal/hash"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/signer"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )
@@ -726,7 +726,7 @@ func newTestStreamingRequest(method, urlStr string, dataLength, chunkSize int64,
 
 	if body == nil {
 		// this is added to avoid panic during io.ReadAll(req.Body).
-		// th stack trace can be found here  https://github.com/minio/minio/pull/2074 .
+		// th stack trace can be found here  https://github.com/chainguard-forks/minio/pull/2074 .
 		// This is very similar to https://github.com/golang/go/issues/7527.
 		req.Body = io.NopCloser(bytes.NewReader([]byte("")))
 	}

@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/jwt"
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	"github.com/minio/minio/internal/jwt"
 )
 
 const (

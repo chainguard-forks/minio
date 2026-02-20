@@ -32,10 +32,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/crypto"
+	"github.com/chainguard-forks/minio/internal/hash"
+	"github.com/chainguard-forks/minio/internal/kms"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/kms"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -441,7 +441,7 @@ func (config *TierConfigMgr) configReader(ctx context.Context) (*PutObjReader, *
 
 	// Note: Local variables with names ek, oek, etc are named inline with
 	// acronyms defined here -
-	// https://github.com/minio/minio/blob/master/docs/security/README.md#acronyms
+	// https://github.com/chainguard-forks/minio/blob/master/docs/security/README.md#acronyms
 
 	// Encrypt json encoded tier configurations
 	metadata := make(map[string]string)

@@ -40,11 +40,11 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/chainguard-forks/minio/internal/auth"
+	"github.com/chainguard-forks/minio/internal/hash/sha256"
+	xhttp "github.com/chainguard-forks/minio/internal/http"
+	ioutilx "github.com/chainguard-forks/minio/internal/ioutil"
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
-	ioutilx "github.com/minio/minio/internal/ioutil"
 )
 
 // Type to capture different modifications to API request to simulate failure cases.

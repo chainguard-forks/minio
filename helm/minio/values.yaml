@@ -127,13 +127,13 @@ pools: 1
 ## TLS Settings for MinIO
 tls:
   enabled: false
-  ## Create a secret with private.key and public.crt files and pass that here. Ref: https://github.com/minio/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
+  ## Create a secret with private.key and public.crt files and pass that here. Ref: https://github.com/chainguard-forks/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
   certSecret: ""
   publicCrt: public.crt
   privateKey: private.key
 
 ## Trusted Certificates Settings for MinIO. Ref: https://docs.min.io/community/minio-object-store/operations/network-encryption.html#third-party-certificate-authorities
-## Bundle multiple trusted certificates into one secret and pass that here. Ref: https://github.com/minio/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
+## Bundle multiple trusted certificates into one secret and pass that here. Ref: https://github.com/chainguard-forks/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
 ## When using self-signed certificates, remember to include MinIO's own certificate in the bundle with key public.crt.
 ## If certSecret is left empty and tls is enabled, this chart installs the public certificate from .Values.tls.certSecret.
 trustedCertsSecret: ""
@@ -617,7 +617,7 @@ metrics:
     # Scrape timeout, for example `scrapeTimeout: 10s`
     scrapeTimeout: ~
 
-## ETCD settings: https://github.com/minio/minio/blob/master/docs/sts/etcd.md
+## ETCD settings: https://github.com/chainguard-forks/minio/blob/master/docs/sts/etcd.md
 ## Define endpoints to enable this section.
 etcd:
   endpoints: []

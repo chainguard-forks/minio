@@ -12,7 +12,7 @@ This document explains how to configure MinIO server with TLS certificates on Ku
 
 For a [distributed MinIO setup](https://docs.min.io/community/minio-object-store/operations/deployments/kubernetes.html), where there are multiple pods with different domain names expected to run, you will either need wildcard certificates valid for all the domains or have specific certificates for each domain. If you are going to use specific certificates, make sure to create Kubernetes secrets accordingly.
 
-For testing purposes, here is [how to create self-signed certificates](https://github.com/minio/minio/tree/master/docs/tls#3-generate-self-signed-certificates).
+For testing purposes, here is [how to create self-signed certificates](https://github.com/chainguard-forks/minio/tree/master/docs/tls#3-generate-self-signed-certificates).
 
 ## 2. Create Kubernetes secret
 

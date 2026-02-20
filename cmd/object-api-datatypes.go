@@ -24,10 +24,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/bucket/replication"
+	"github.com/chainguard-forks/minio/internal/hash"
 	"github.com/dustin/go-humanize"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/hash"
 )
 
 //go:generate msgp -file $GOFILE -io=false -tests=false -unexported=false

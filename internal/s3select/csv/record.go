@@ -25,9 +25,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/chainguard-forks/minio/internal/s3select/jstream"
+	"github.com/chainguard-forks/minio/internal/s3select/sql"
 	csv "github.com/minio/csvparser"
-	"github.com/minio/minio/internal/s3select/jstream"
-	"github.com/minio/minio/internal/s3select/sql"
 )
 
 // Record - is a CSV record.

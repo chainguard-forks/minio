@@ -28,9 +28,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chainguard-forks/minio/internal/auth"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/logger"
 	xldap "github.com/minio/pkg/v3/ldap"
 	xsftp "github.com/minio/pkg/v3/sftp"
 	"github.com/pkg/sftp"

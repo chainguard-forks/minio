@@ -24,8 +24,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/logger"
+	"github.com/chainguard-forks/minio/internal/ioutil"
+	"github.com/chainguard-forks/minio/internal/logger"
 	"github.com/minio/sio"
 )
 
@@ -37,7 +37,7 @@ const (
 	// InsecureSealAlgorithm is the legacy encryption/sealing algorithm used
 	// to derive & seal the key-encryption-key and to en/decrypt the object data.
 	// This algorithm should not be used for new objects because its key derivation
-	// is not optimal. See: https://github.com/minio/minio/pull/6121
+	// is not optimal. See: https://github.com/chainguard-forks/minio/pull/6121
 	InsecureSealAlgorithm = "DARE-SHA256"
 )
 
