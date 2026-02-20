@@ -2,22 +2,6 @@ name: Create Release
 
 on:
   workflow_dispatch:
-    inputs:
-      release_title:
-        description: "Release title"
-        required: true
-        default: "Bugfix Release"
-        type: choice
-        options:
-          - "Bugfix Release"
-          - "Security fix release"
-          - "Security and bug fix release"
-          - "Breaking Release"
-          - "Custom (specify below)"
-      custom_title:
-        description: "Custom release title (only used when 'Custom' is selected above)"
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -46,22 +30,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine release title
-        id: title
-        env:
-          RELEASE_TITLE: ${{ inputs.release_title }}
-          CUSTOM_TITLE: ${{ inputs.custom_title }}
-        run: |
-          if [ "$RELEASE_TITLE" = "Custom (specify below)" ]; then
-            if [ -z "$CUSTOM_TITLE" ]; then
-              echo "::error::Custom title selected but no custom title provided"
-              exit 1
-            fi
-            echo "title=$CUSTOM_TITLE" >> "$GITHUB_OUTPUT"
-          else
-            echo "title=$RELEASE_TITLE" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Generate release tag
         id: tag
         run: |
@@ -76,9 +44,7 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TITLE: ${{ steps.title.outputs.title }}
         run: |
           gh release create "${{ steps.tag.outputs.tag }}" \
-            --title "$TITLE" \
-            --generate-notes \
-            --target master
+            --title "${{ steps.tag.outputs.tag }}" \
+            --generate-notes
