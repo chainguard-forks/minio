@@ -79,7 +79,7 @@ jobs:
               echo "need_release=no" >> $GITHUB_OUTPUT
             else
               echo "Tag $TAG exists, but no release is associated. Need a new release."
-              echo "need_release=yes" >> $GITHUB_OUTPUT
+              echo "need_release=yes" >> "$GITHUB_OUTPUT"
             fi
           fi
 
