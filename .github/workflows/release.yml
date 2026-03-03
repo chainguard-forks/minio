@@ -97,14 +97,6 @@ jobs:
           TAG="RELEASE.$(date -u '+%Y-%m-%dT%H-%M-%SZ')"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Create tag
-        if: steps.check.outputs.need_release == 'yes'
-        env:
-          GH_TOKEN: ${{ steps.octo-sts.outputs.token }}
-        run: |
-          git tag "${{ steps.tag.outputs.tag }}"
-          git push origin "${{ steps.tag.outputs.tag }}"
-
       - name: Create GitHub release
         if: steps.check.outputs.need_release == 'yes'
         env:
