@@ -6,6 +6,7 @@ set -e
 set -x
 
 export CI=1
+export MINIO_BROWSER=off
 
 make || exit 255
 
