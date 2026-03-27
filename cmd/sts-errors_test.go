@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/xml"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +11,7 @@ import (
 
 func TestSTSLDAPAuthFailureResponse(t *testing.T) {
 	w := httptest.NewRecorder()
-	writeSTSErrorResponse(nil, w, ErrSTSLDAPAuthFailure, nil)
+	writeSTSErrorResponse(context.TODO(), w, ErrSTSLDAPAuthFailure, nil)
 
 	resp := w.Result()
 	if resp.StatusCode != http.StatusForbidden {
@@ -37,7 +38,7 @@ func TestSTSLDAPAuthFailureResponse(t *testing.T) {
 
 func TestSTSTooManyAuthRequestsResponse(t *testing.T) {
 	w := httptest.NewRecorder()
-	writeSTSErrorResponse(nil, w, ErrSTSTooManyAuthRequests, nil)
+	writeSTSErrorResponse(context.TODO(), w, ErrSTSTooManyAuthRequests, nil)
 
 	resp := w.Result()
 	if resp.StatusCode != http.StatusTooManyRequests {
