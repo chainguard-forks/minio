@@ -86,6 +86,8 @@ const (
 	ErrSTSIAMNotInitialized
 	ErrSTSUpstreamError
 	ErrSTSInternalError
+	ErrSTSLDAPAuthFailure
+	ErrSTSTooManyAuthRequests
 )
 
 type stsErrorCodeMap map[STSErrorCode]STSError
@@ -170,5 +172,15 @@ var stsErrCodes = stsErrorCodeMap{
 		Code:           "InternalError",
 		Description:    "We encountered an internal error generating credentials, please try again.",
 		HTTPStatusCode: http.StatusInternalServerError,
+	},
+	ErrSTSLDAPAuthFailure: {
+		Code:           "AccessDenied",
+		Description:    "LDAP authentication failed.",
+		HTTPStatusCode: http.StatusForbidden,
+	},
+	ErrSTSTooManyAuthRequests: {
+		Code:           "RequestLimitExceeded",
+		Description:    "Too many authentication requests. Please try again later.",
+		HTTPStatusCode: http.StatusTooManyRequests,
 	},
 }
