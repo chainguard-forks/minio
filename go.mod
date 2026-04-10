@@ -1,6 +1,6 @@
 module github.com/chainguard-forks/minio
 
-go 1.25.8
+go 1.25.9
 
 // Install tools using 'go install tool'.
 tool (

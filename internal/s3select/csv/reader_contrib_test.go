@@ -285,6 +285,130 @@ func (e errReader) Read(p []byte) (n int, err error) {
 	return 0, e.err
 }
 
+// baseArgs returns a ReaderArgs with sensible defaults for testing.
+func baseArgs(header string) *ReaderArgs {
+	return &ReaderArgs{
+		FileHeaderInfo:             header,
+		RecordDelimiter:            "\n",
+		FieldDelimiter:             ",",
+		QuoteCharacter:             defaultQuoteCharacter,
+		QuoteEscapeCharacter:       defaultQuoteEscapeCharacter,
+		CommentCharacter:           defaultCommentCharacter,
+		AllowQuotedRecordDelimiter: false,
+		unmarshaled:                true,
+	}
+}
+
+// drainReader reads all records from r until an error (including io.EOF).
+func drainReader(r *Reader) error {
+	var record sql.Record
+	var err error
+	for {
+		record, err = r.Read(record)
+		if err != nil {
+			return err
+		}
+	}
+}
+
+// Before the fix, bufio.Reader.ReadBytes('\n') had no size cap. An input file
+// with no newlines caused the entire content to be allocated in one read,
+// enabling a DoS by any authenticated user with s3:PutObject + s3:GetObject.
+// With gzip compression a ~2 MB upload could expand to gigabytes on the server.
+//
+// See CVE-2026-39414 / GHSA-h749-fxx7-pwpg.
+func TestNextSplitLineLimitCVE2026_39414(t *testing.T) {
+	// Sub-test 1: header line path (nextSplit with skip=0).
+	// FileHeaderInfo=use causes startReaders to call nextSplit(0, nil) before
+	// any data is read. If the first line has no newline and exceeds
+	// csvSplitSize, the error should surface from NewReader itself.
+	t.Run("header line too long", func(t *testing.T) {
+		hugeLine := strings.Repeat("a", csvSplitSize+1) // no newline, > 128 KB
+
+		r, err := NewReader(io.NopCloser(strings.NewReader(hugeLine)), baseArgs(use))
+		if err != nil {
+			// Error returned at construction – fix is working.
+			return
+		}
+		defer r.Close()
+
+		err = drainReader(r)
+		if err == io.EOF {
+			t.Fatal("CVE-2026-39414: expected line-too-long error, got EOF (unbounded read succeeded)")
+		}
+	})
+
+	// Sub-test 2: data block path (nextSplit with skip=csvSplitSize).
+	// A valid header line is followed by a payload that is far larger than
+	// csvSplitSize with no newlines. nextSplit reads the fixed-size block
+	// successfully, then the newline-seeking loop must hit the cap.
+	t.Run("data block line too long", func(t *testing.T) {
+		header := "col1,col2\n"
+		// 2× csvSplitSize + 1 bytes of content with no newlines.
+		// After reading one csvSplitSize block the tail-newline scan exceeds
+		// the cap before finding '\n'.
+		hugeLine := strings.Repeat("x", 2*csvSplitSize+1)
+
+		r, err := NewReader(io.NopCloser(strings.NewReader(header+hugeLine)), baseArgs(use))
+		if err != nil {
+			return
+		}
+		defer r.Close()
+
+		err = drainReader(r)
+		if err == io.EOF {
+			t.Fatal("CVE-2026-39414: expected line-too-long error, got EOF (unbounded read succeeded)")
+		}
+	})
+
+	// Sub-test 3: regression – normal CSV must still parse correctly.
+	t.Run("normal CSV unaffected", func(t *testing.T) {
+		content := "name,age\nAlice,30\nBob,25\n"
+
+		r, err := NewReader(io.NopCloser(strings.NewReader(content)), baseArgs(use))
+		if err != nil {
+			t.Fatalf("unexpected error creating reader: %v", err)
+		}
+		defer r.Close()
+
+		count := 0
+		var record sql.Record
+		for {
+			record, err = r.Read(record)
+			if err != nil {
+				break
+			}
+			count++
+		}
+		if err != io.EOF {
+			t.Fatalf("expected io.EOF, got: %v", err)
+		}
+		if count != 2 {
+			t.Fatalf("expected 2 records, got %d", count)
+		}
+	})
+
+	// Sub-test 4: line exactly at the limit must still succeed.
+	// A line of exactly csvSplitSize bytes followed by a newline should not
+	// be rejected (the cap is >, not >=).
+	t.Run("line at exact limit succeeds", func(t *testing.T) {
+		// Build: header + newline + exactly csvSplitSize 'z' bytes + newline
+		line := strings.Repeat("z", csvSplitSize) + "\n"
+		content := "col\n" + line
+
+		r, err := NewReader(io.NopCloser(strings.NewReader(content)), baseArgs(use))
+		if err != nil {
+			t.Fatalf("unexpected error for line at limit: %v", err)
+		}
+		defer r.Close()
+
+		err = drainReader(r)
+		if err != io.EOF {
+			t.Fatalf("expected io.EOF for line at limit, got: %v", err)
+		}
+	})
+}
+
 func TestReadFailures(t *testing.T) {
 	customErr := errors.New("unable to read file :(")
 	cases := []struct {
