@@ -139,10 +139,23 @@ func (r *Reader) nextSplit(skip int, dst []byte) ([]byte, error) {
 			return dst, io.EOF
 		}
 	}
-	// Read until next line.
-	in, err := r.buf.ReadBytes('\n')
-	dst = append(dst, in...)
-	return dst, err
+	// Read until next newline, capped at csvSplitSize bytes to prevent
+	// unbounded memory allocation (CVE-2026-39414 / GHSA-h749-fxx7-pwpg).
+	var lineBytes int
+	for {
+		slice, err := r.buf.ReadSlice('\n')
+		dst = append(dst, slice...)
+		lineBytes += len(slice)
+		if err == nil {
+			return dst, nil
+		}
+		if lineBytes > csvSplitSize {
+			return nil, fmt.Errorf("csv: line length exceeds the maximum limit of %d bytes", csvSplitSize)
+		}
+		if err != bufio.ErrBufferFull {
+			return dst, err
+		}
+	}
 }
 
 // csvSplitSize is the size of each block.
