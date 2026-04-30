@@ -53,12 +53,12 @@ func (rl *stsAuthRateLimiter) Allow(ip string) bool {
 
 // cleanup periodically removes stale entries.
 func (rl *stsAuthRateLimiter) cleanup() {
-	ticker := time.NewTicker(5 * time.Minute)
+	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		rl.mu.Lock()
-		cutoff := time.Now().Add(-10 * time.Minute)
+		cutoff := time.Now().Add(-2 * time.Minute)
 		for ip, entry := range rl.limiters {
 			if entry.lastSeen.Before(cutoff) {
 				delete(rl.limiters, ip)
