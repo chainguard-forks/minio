@@ -72,7 +72,7 @@ func TestSTSAuthRateLimiterCleanup(t *testing.T) {
 		t.Fatalf("expected 1 entry, got %d", len(rl.limiters))
 	}
 	// Backdate the entry so cleanup considers it stale.
-	rl.limiters["10.0.0.1"].lastSeen = rl.limiters["10.0.0.1"].lastSeen.Add(-15 * 60 * 1e9) // 15 minutes ago
+	rl.limiters["10.0.0.1"].lastSeen = rl.limiters["10.0.0.1"].lastSeen.Add(-15 * time.Minute) // 15 minutes ago
 	rl.mu.Unlock()
 
 	// Add a fresh entry that should survive cleanup.
