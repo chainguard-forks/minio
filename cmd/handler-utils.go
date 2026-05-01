@@ -203,12 +203,21 @@ func extractMetadataFromMime(ctx context.Context, v textproto.MIMEHeader, m map[
 		nv[http.CanonicalHeaderKey(k)] = kv
 	}
 
+	// Guard: SSE replication headers must only be accepted from genuine
+	// replication requests. A regular client supplying these headers could
+	// inject fake sealed key material and bypass SSE verification
+	// (CVE-2026-34204).
+	isReplicationReq := len(nv[http.CanonicalHeaderKey(xhttp.MinIOSourceReplicationRequest)]) > 0
+
 	// Save all supported headers.
 	for _, supportedHeader := range supportedHeaders {
 		value, ok := nv[http.CanonicalHeaderKey(supportedHeader)]
 		if ok {
-			if v, ok := replicationToInternalHeaders[supportedHeader]; ok {
-				m[v] = strings.Join(value, ",")
+			if internalHeader, ok := replicationToInternalHeaders[supportedHeader]; ok {
+				if !isReplicationReq {
+					continue
+				}
+				m[internalHeader] = strings.Join(value, ",")
 			} else {
 				m[supportedHeader] = strings.Join(value, ",")
 			}
