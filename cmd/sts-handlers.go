@@ -33,6 +33,7 @@ import (
 
 	"github.com/chainguard-forks/minio/internal/auth"
 	"github.com/chainguard-forks/minio/internal/config/identity/openid"
+	"github.com/chainguard-forks/minio/internal/handlers"
 	"github.com/chainguard-forks/minio/internal/hash/sha256"
 	xhttp "github.com/chainguard-forks/minio/internal/http"
 	"github.com/chainguard-forks/minio/internal/logger"
@@ -690,10 +691,18 @@ func (sts *stsAPIHandlers) AssumeRoleWithLDAPIdentity(w http.ResponseWriter, r *
 		return
 	}
 
+	// Per-IP rate limiting to mitigate brute-force attacks.
+	if !globalSTSAuthRateLimiter.Allow(handlers.GetSourceIP(r)) {
+		writeSTSErrorResponse(ctx, w, ErrSTSTooManyAuthRequests, nil)
+		return
+	}
+
 	lookupResult, groupDistNames, err := globalIAMSys.LDAPConfig.Bind(ldapUsername, ldapPassword)
 	if err != nil {
-		err = fmt.Errorf("LDAP server error: %w", err)
-		writeSTSErrorResponse(ctx, w, ErrSTSInvalidParameterValue, err)
+		// Log the detailed error server-side for debugging, but return a
+		// generic message to the client to prevent user enumeration.
+		stsLogIf(ctx, fmt.Errorf("LDAP server error: %w", err))
+		writeSTSErrorResponse(ctx, w, ErrSTSLDAPAuthFailure, nil)
 		return
 	}
 	ldapUserDN := lookupResult.NormDN
