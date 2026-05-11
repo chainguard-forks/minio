@@ -272,3 +272,5 @@ require (
 	google.golang.org/grpc v1.79.3 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.23.1-0.20260429145742-d2acd3c49e58
