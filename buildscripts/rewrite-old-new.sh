@@ -16,7 +16,7 @@ fi
 
 function download_old_release() {
 	if [ ! -f minio.RELEASE.2020-10-28T08-16-50Z ]; then
-		curl --silent --max-time 300 -O https://dl.minio.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
+		curl --silent --max-time 300 -fL -o minio.RELEASE.2020-10-28T08-16-50Z https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
 		chmod a+x minio.RELEASE.2020-10-28T08-16-50Z
 	fi
 }
