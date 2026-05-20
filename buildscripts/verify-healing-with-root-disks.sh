@@ -33,9 +33,12 @@ function start_minio() {
 
 	# Wait until all nodes return 403
 	for i in $(seq 1 4); do
+		srv_wait=0
 		while [ "$(curl -m 1 -s -o /dev/null -w "%{http_code}" http://localhost:$((start_port + i)))" -ne "403" ]; do
 			echo -n "."
 			sleep 1
+			srv_wait=$((srv_wait + 1))
+			if [ $srv_wait -ge 120 ]; then echo "Timed out waiting for server $i to start" && exit 1; fi
 		done
 	done
 
@@ -65,10 +68,13 @@ function main() {
 	# Unmount the disk, after the unmount the device id
 	# /tmp/xxx/mnt/disk4 will be the same as '/' and it
 	# will be detected as root disk
+	umount_retries=0
 	while [ "$u" != "0" ]; do
 		sudo umount ${WORK_DIR}/mnt/disk4/
 		u=$?
 		sleep 1
+		umount_retries=$((umount_retries + 1))
+		if [ $umount_retries -ge 30 ]; then echo "Timed out waiting for umount of disk4" && exit 1; fi
 	done
 
 	# Wait until MinIO self heal kicks in
