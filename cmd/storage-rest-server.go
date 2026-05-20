@@ -1305,6 +1305,23 @@ func (s *storageRESTServer) ReadMultiple(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// Reject path traversal in the msgpack body. The global
+	// setRequestValidityMiddleware inspects r.URL.Path and r.Form but does
+	// not see msgpack-encoded body fields, so without this check a caller
+	// holding the cluster root JWT could read files outside the configured
+	// drive roots by smuggling ".." through Bucket / Prefix / Files
+	// (CVE-2026-42600).
+	if hasBadPathComponent(req.Bucket) || hasBadPathComponent(req.Prefix) {
+		rw.CloseWithError(errInvalidArgument)
+		return
+	}
+	for _, f := range req.Files {
+		if hasBadPathComponent(f) {
+			rw.CloseWithError(errInvalidArgument)
+			return
+		}
+	}
+
 	mw := msgp.NewWriter(rw)
 	responses := make(chan ReadMultipleResp, len(req.Files))
 	var wg sync.WaitGroup
