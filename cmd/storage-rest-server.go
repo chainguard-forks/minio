@@ -544,6 +544,14 @@ func (s *storageRESTServer) ReadPartsHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Reject path traversal smuggled through msgpack body (CVE-2026-42600).
+	for _, p := range preq.Paths {
+		if hasBadPathComponent(p) {
+			s.writeErrorResponse(w, errInvalidArgument)
+			return
+		}
+	}
+
 	done := keepHTTPResponseAlive(w)
 	infos, err := s.getStorage().ReadParts(r.Context(), volume, preq.Paths...)
 	done(nil)
@@ -1277,6 +1285,14 @@ func (s *storageRESTServer) DeleteBulkHandler(w http.ResponseWriter, r *http.Req
 	if err := req.DecodeMsg(mr); err != nil {
 		s.writeErrorResponse(w, err)
 		return
+	}
+
+	// Reject path traversal smuggled through msgpack body (CVE-2026-42600).
+	for _, p := range req.Paths {
+		if hasBadPathComponent(p) {
+			s.writeErrorResponse(w, errInvalidArgument)
+			return
+		}
 	}
 
 	volume := r.Form.Get(storageRESTVolume)
