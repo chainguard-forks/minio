@@ -42,9 +42,19 @@ function start_minio_3_node() {
 	timeout 15m /tmp/mc ready myminio || fail
 
 	# Wait for all drives to be online and formatted
-	while [ $(/tmp/mc admin info --json myminio | jq '.info.servers[].drives[].state | select(. != "ok")' | wc -l) -gt 0 ]; do sleep 1; done
+	drive_wait=0
+	while [ $(/tmp/mc admin info --json myminio | jq '.info.servers[].drives[].state | select(. != "ok")' | wc -l) -gt 0 ]; do
+		sleep 1
+		drive_wait=$((drive_wait + 1))
+		if [ $drive_wait -ge 300 ]; then echo "Timed out waiting for drives to reach ok state" && fail; fi
+	done
 	# Wait for all drives to be healed
-	while [ $(/tmp/mc admin info --json myminio | jq '.info.servers[].drives[].healing | select(. != null) | select(. == true)' | wc -l) -gt 0 ]; do sleep 1; done
+	heal_wait=0
+	while [ $(/tmp/mc admin info --json myminio | jq '.info.servers[].drives[].healing | select(. != null) | select(. == true)' | wc -l) -gt 0 ]; do
+		sleep 1
+		heal_wait=$((heal_wait + 1))
+		if [ $heal_wait -ge 600 ]; then echo "Timed out waiting for healing to complete" && fail; fi
+	done
 
 	# Wait for Status: in MinIO output
 	while true; do
@@ -119,7 +129,7 @@ function __init__() {
 	echo '{"version": "3", "credential": {"accessKey": "minio", "secretKey": "minio123"}, "region": "us-east-1"}' >"$MINIO_CONFIG_DIR/config.json"
 
 	if [ ! -f /tmp/mc ]; then
-		wget --quiet -O /tmp/mc https://dl.minio.io/client/mc/release/linux-amd64/mc &&
+		wget --quiet --timeout=300 -O /tmp/mc https://dl.minio.io/client/mc/release/linux-amd64/mc &&
 			chmod +x /tmp/mc
 	fi
 }

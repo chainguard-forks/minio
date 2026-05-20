@@ -16,7 +16,7 @@ fi
 
 function download_old_release() {
 	if [ ! -f minio.RELEASE.2020-10-28T08-16-50Z ]; then
-		curl --silent -O https://dl.minio.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
+		curl --silent --max-time 300 -fL -o minio.RELEASE.2020-10-28T08-16-50Z https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
 		chmod a+x minio.RELEASE.2020-10-28T08-16-50Z
 	fi
 }
@@ -31,7 +31,7 @@ function verify_rewrite() {
 	export MINIO_CI_CD=1
 
 	MC_BUILD_DIR="mc-$RANDOM"
-	if ! git clone --quiet https://github.com/minio/mc "$MC_BUILD_DIR"; then
+	if ! timeout 5m git clone --quiet https://github.com/minio/mc "$MC_BUILD_DIR"; then
 		echo "failed to download https://github.com/minio/mc"
 		purge "${MC_BUILD_DIR}"
 		exit 1
@@ -46,7 +46,7 @@ function verify_rewrite() {
 	pid=$!
 	disown $pid
 
-	"${WORK_DIR}/mc" ready minio/
+	timeout 15m "${WORK_DIR}/mc" ready minio/
 
 	if ! ps -p ${pid} 1>&2 >/dev/null; then
 		echo "server1 log:"
@@ -79,7 +79,7 @@ function verify_rewrite() {
 	pid=$!
 	disown $pid
 
-	"${WORK_DIR}/mc" ready minio/
+	timeout 15m "${WORK_DIR}/mc" ready minio/
 
 	if ! ps -p ${pid} 1>&2 >/dev/null; then
 		echo "server1 log:"

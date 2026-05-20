@@ -24,7 +24,7 @@ function start_minio_5drive() {
 	export MINIO_CI_CD=1
 
 	MC_BUILD_DIR="mc-$RANDOM"
-	if ! git clone --quiet https://github.com/minio/mc "$MC_BUILD_DIR"; then
+	if ! timeout 5m git clone --quiet https://github.com/minio/mc "$MC_BUILD_DIR"; then
 		echo "failed to download https://github.com/minio/mc"
 		purge "${MC_BUILD_DIR}"
 		exit 1
