@@ -128,6 +128,7 @@ func runAllTests(suite *TestSuiteCommon, c *check) {
 	suite.TestBucketSQSNotificationWebHook(c)
 	suite.TestBucketSQSNotificationAMQP(c)
 	suite.TestUnsignedCVE(c)
+	suite.TestCVE202641145(c)
 	suite.TearDownSuite(c)
 }
 
@@ -407,6 +408,81 @@ func (s *TestSuiteCommon) TestUnsignedCVE(c *check) {
 
 	// assert the http response status code.
 	c.Assert(response.StatusCode, http.StatusBadRequest)
+}
+
+// TestCVE202641145 is a regression test for CVE-2026-41145: an authentication
+// bypass in the STREAMING-UNSIGNED-PAYLOAD-TRAILER code path.
+//
+// Before the fix, isPutActionAllowed accepted credentials supplied via the
+// X-Amz-Credential query parameter, but the signature gate in
+// newUnsignedV4ChunkedReader only checked for the Authorization *header*.
+// An attacker could therefore omit the Authorization header, supply credentials
+// in the query string, pass the IAM check, and have the body written without
+// any signature ever being verified.
+func (s *TestSuiteCommon) TestCVE202641145(c *check) {
+	c.Helper()
+
+	body := []byte("attack-payload")
+	bucketName := getRandomBucketName()
+
+	request, err := newTestSignedRequest(http.MethodPut, getMakeBucketURL(s.endPoint, bucketName),
+		0, nil, s.accessKey, s.secretKey, s.signer)
+	c.Assert(err, nil)
+	response, err := s.client.Do(request)
+	c.Assert(err, nil)
+	c.Assert(response.StatusCode, http.StatusOK)
+
+	now := UTCNow()
+	region := globalSite.Region()
+
+	// --- Attack case: X-Amz-Credential in query string, no Authorization header.
+	//
+	// getRequestAuthType classifies this as authTypeStreamingUnsignedTrailer
+	// (the x-amz-content-sha256 header match fires before isRequestPresignedSignatureV4).
+	// isPutActionAllowed then authenticates the caller from the query string.
+	// Before the fix, hasCreds was false (header absent) so doesSignatureMatch
+	// was never called and the write went through unauthenticated.
+	credScope := s.accessKey + SlashSeparator + getScope(now, region)
+	attackURL := makeTestTargetURL(s.endPoint, bucketName, "attack-object", url.Values{
+		xhttp.AmzCredential: []string{credScope},
+		xhttp.AmzDate:       []string{now.Format(iso8601Format)},
+	})
+
+	attackReq, err := http.NewRequest(http.MethodPut, attackURL, nil)
+	c.Assert(err, nil)
+	attackReq.Body = io.NopCloser(bytes.NewReader(body))
+	attackReq.Header.Set("x-amz-content-sha256", unsignedPayloadTrailer)
+	attackReq.Header.Set("X-Amz-Decoded-Content-Length", fmt.Sprintf("%d", len(body)))
+	attackReq.Header.Set("Content-Encoding", "aws-chunked")
+	attackReq = signer.StreamingUnsignedV4(attackReq, "", int64(len(body)), now)
+	attackReq.Header.Del("Authorization")
+
+	response, err = s.client.Do(attackReq)
+	c.Assert(err, nil)
+	if response.StatusCode == http.StatusOK {
+		c.Fatal("CVE-2026-41145: unsigned-trailer PUT with query-string-only credentials was accepted; signature verification bypass is present")
+	}
+
+	// --- Legitimate case: same streaming content type with a proper Authorization header.
+	//
+	// Ensures the fix does not break correctly signed STREAMING-UNSIGNED-PAYLOAD-TRAILER uploads.
+	// We manually encode the aws-chunked body to avoid TransferEncoding interference from
+	// signer.StreamingUnsignedV4, which sets req.TransferEncoding and causes Go's HTTP client
+	// to double-encode the body.
+	chunkedBody := fmt.Sprintf("%x\r\n%s\r\n0\r\n", len(body), body)
+	legitReq, err := http.NewRequest(http.MethodPut, getPutObjectURL(s.endPoint, bucketName, "legit-object"), nil)
+	c.Assert(err, nil)
+	legitReq.Body = io.NopCloser(strings.NewReader(chunkedBody))
+	legitReq.ContentLength = int64(len(chunkedBody))
+	legitReq.Header.Set("x-amz-content-sha256", unsignedPayloadTrailer)
+	legitReq.Header.Set("X-Amz-Decoded-Content-Length", fmt.Sprintf("%d", len(body)))
+	legitReq.Header.Set("Content-Encoding", "aws-chunked")
+	err = signRequestV4(legitReq, s.accessKey, s.secretKey)
+	c.Assert(err, nil)
+
+	response, err = s.client.Do(legitReq)
+	c.Assert(err, nil)
+	c.Assert(response.StatusCode, http.StatusOK)
 }
 
 func (s *TestSuiteCommon) TestBucketSQSNotificationAMQP(c *check) {
