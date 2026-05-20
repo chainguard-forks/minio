@@ -1896,7 +1896,12 @@ func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Req
 		}
 	case authTypeStreamingUnsignedTrailer:
 		// Initialize stream chunked reader with optional trailers.
-		rd, s3Err = newUnsignedV4ChunkedReader(r, true, r.Header.Get(xhttp.Authorization) != "")
+		// Require signature verification whenever credentials are supplied via
+		// either the Authorization header or the X-Amz-Credential query
+		// parameter; otherwise an attacker could pass credentials through the
+		// query string and bypass signing entirely (CVE-2026-41145).
+		hasCreds := r.Header.Get(xhttp.Authorization) != "" || r.Form.Get(xhttp.AmzCredential) != ""
+		rd, s3Err = newUnsignedV4ChunkedReader(r, true, hasCreds)
 		if s3Err != ErrNone {
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Err), r.URL)
 			return
