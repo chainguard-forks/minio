@@ -41,7 +41,7 @@ services:
       - site2-data4-2:/data2
 
   site2-nginx:
-    image: nginx:1.19.2-alpine
+    image: nginx:1.30.2-alpine
     hostname: site2-nginx
     volumes:
       - ./nginx-site2.conf:/etc/nginx/nginx.conf:ro

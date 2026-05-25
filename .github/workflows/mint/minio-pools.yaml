@@ -79,7 +79,7 @@ services:
       - pdata8-2:/pdata2
       
   nginx:
-    image: nginx:1.19.2-alpine
+    image: nginx:1.30.2-alpine
     hostname: nginx
     volumes:
       - ./nginx-8-node.conf:/etc/nginx/nginx.conf:ro

@@ -45,7 +45,7 @@ services:
       - data4-3:/data3
 
   nginx:
-    image: nginx:1.19.2-alpine
+    image: nginx:1.30.2-alpine
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
