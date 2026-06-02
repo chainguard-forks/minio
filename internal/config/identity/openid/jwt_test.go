@@ -19,6 +19,8 @@ package openid
 
 import (
 	"bytes"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -72,9 +74,9 @@ func TestUpdateClaimsExpiry(t *testing.T) {
 	}
 }
 
-func initJWKSServer() *httptest.Server {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		const jsonkey = `{"keys":
+// jwksRSA is a sample JWKS document containing a single RSA public key with
+// kid "2011-04-29".
+const jwksRSA = `{"keys":
        [
          {"kty":"RSA",
           "n": "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
@@ -83,7 +85,10 @@ func initJWKSServer() *httptest.Server {
           "kid":"2011-04-29"}
        ]
      }`
-		w.Write([]byte(jsonkey))
+
+func initJWKSServer() *httptest.Server {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(jwksRSA))
 	}))
 	return server
 }
@@ -129,6 +134,12 @@ func TestJWTHMACType(t *testing.T) {
 	provider := providerCfg{
 		ClientID:     "76b95ae5-33ef-4283-97b7-d2a85dc2d8f4",
 		ClientSecret: "WNGvKVyyNmXq0TraSvjaDN9CtpFgx35IXtGEffMCPR0",
+		// A symmetric (HMAC) IdP advertises an HS* id_token signing algorithm in
+		// its discovery document. Required after the CVE-2026-33322 fix for the
+		// ClientSecret to be honoured as an HMAC verification key.
+		DiscoveryDoc: DiscoveryDoc{
+			IDTokenSigningAlgValuesSupported: []string{"HS256"},
+		},
 	}
 	provider.JWKS.URL = u1
 	cfg := Config{
@@ -149,6 +160,152 @@ func TestJWTHMACType(t *testing.T) {
 	if err = cfg.Validate(t.Context(), DummyRoleARN, token, "", "", claims); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// TestJWTAlgConfusion is a regression test for CVE-2026-33322 /
+// GHSA-5cx5-wh4m-82fh (JWT algorithm confusion in OIDC auth).
+//
+// When an asymmetric IdP signing key is configured (via JWKS), an attacker who
+// knows the ClientSecret must NOT be able to forge a token of the shape
+// {"alg":"HS256","kid":"<ClientID>"} signed with the ClientSecret and have it
+// accepted. We also assert that a legitimate RSA-signed token continues to
+// validate, and that a genuine symmetric (HMAC) setup still works.
+func TestJWTAlgConfusion(t *testing.T) {
+	server := initJWKSServer() // serves an RSA key with kid "2011-04-29"
+	defer server.Close()
+
+	u1, err := xnet.ParseHTTPURL(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const clientID = "76b95ae5-33ef-4283-97b7-d2a85dc2d8f4"
+	const clientSecret = "WNGvKVyyNmXq0TraSvjaDN9CtpFgx35IXtGEffMCPR0"
+
+	// newCfg builds a Config for a provider. algs is what the IdP's discovery
+	// document advertises as its id_token signing algorithms. The ClientSecret
+	// is registered as an HMAC key under the ClientID exactly like
+	// PopulatePublicKey does, and the asymmetric JWKS key (kid "2011-04-29") is
+	// loaded, mirroring a real deployment where both live in the same key map.
+	newCfg := func(algs ...string) (Config, *rsa.PrivateKey) {
+		pubKeys := publicKeys{
+			RWMutex: &sync.RWMutex{},
+			pkMap:   map[string]any{},
+		}
+		pubKeys.add(clientID, []byte(clientSecret))
+		if err := pubKeys.parseAndAdd(bytes.NewBufferString(jwksRSA)); err != nil {
+			t.Fatalf("Error loading pubkeys: %v", err)
+		}
+		// Add a fresh RSA key we control under a known kid so we can mint
+		// genuinely IdP-signed RS256 tokens.
+		privKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pubKeys.add("rs-test-kid", &privKey.PublicKey)
+
+		provider := providerCfg{
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			DiscoveryDoc: DiscoveryDoc{
+				IDTokenSigningAlgValuesSupported: algs,
+			},
+		}
+		provider.JWKS.URL = u1
+		return Config{
+			Enabled: true,
+			pubKeys: pubKeys,
+			arnProviderCfgsMap: map[arn.ARN]*providerCfg{
+				DummyRoleARN: &provider,
+			},
+			ProviderCfgs: map[string]*providerCfg{
+				"1": &provider,
+			},
+			closeRespFn: func(rc io.ReadCloser) { rc.Close() },
+		}, privKey
+	}
+
+	// (a) THE EXPLOIT. Asymmetric IdP (advertises only RS256). Attacker who
+	// knows the ClientSecret forges {"alg":"HS256","kid":"<ClientID>"} and signs
+	// it with the ClientSecret. Pre-fix this verified against the HMAC key
+	// registered under the ClientID and was accepted. It MUST now be rejected.
+	t.Run("exploit-hs256-kid-clientID", func(t *testing.T) {
+		cfg, _ := newCfg("RS256")
+		tok := jwtgo.New(jwtgo.SigningMethodHS256)
+		tok.Header["kid"] = clientID
+		tok.Claims = jwtgo.MapClaims{
+			"exp": time.Now().Add(time.Hour).Unix(),
+			"aud": clientID,
+		}
+		signed, err := tok.SignedString([]byte(clientSecret))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var claims jwtgo.MapClaims
+		if err := cfg.Validate(t.Context(), DummyRoleARN, signed, "", "", claims); err == nil {
+			t.Fatal("SECURITY: forged HS256 token (kid=ClientID, signed with ClientSecret) was ACCEPTED against an asymmetric IdP")
+		}
+	})
+
+	// (a2) Variant: attacker targets the asymmetric JWKS kid with an HS256 alg.
+	// Must also be rejected (key-type/alg binding in the keyfunc).
+	t.Run("exploit-hs256-kid-asymmetric", func(t *testing.T) {
+		cfg, _ := newCfg("RS256")
+		tok := jwtgo.New(jwtgo.SigningMethodHS256)
+		tok.Header["kid"] = "2011-04-29"
+		tok.Claims = jwtgo.MapClaims{
+			"exp": time.Now().Add(time.Hour).Unix(),
+			"aud": clientID,
+		}
+		signed, err := tok.SignedString([]byte(clientSecret))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var claims jwtgo.MapClaims
+		if err := cfg.Validate(t.Context(), DummyRoleARN, signed, "", "", claims); err == nil {
+			t.Fatal("SECURITY: HS256 token with asymmetric kid was accepted")
+		}
+	})
+
+	// (b) Legitimate RSA-signed token (the normal path for an asymmetric IdP)
+	// still validates.
+	t.Run("legitimate-rs256", func(t *testing.T) {
+		cfg, privKey := newCfg("RS256")
+		tok := jwtgo.New(jwtgo.SigningMethodRS256)
+		tok.Header["kid"] = "rs-test-kid"
+		tok.Claims = jwtgo.MapClaims{
+			"exp": time.Now().Add(time.Hour).Unix(),
+			"aud": clientID,
+		}
+		signed, err := tok.SignedString(privKey)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var claims jwtgo.MapClaims
+		if err := cfg.Validate(t.Context(), DummyRoleARN, signed, "", "", claims); err != nil {
+			t.Fatalf("legitimate RS256 token rejected: %v", err)
+		}
+	})
+
+	// (c) Genuine symmetric (HMAC) deployment: the IdP advertises HS256, so an
+	// HS256 token whose kid resolves to the HMAC secret must still validate.
+	t.Run("legitimate-hs256", func(t *testing.T) {
+		cfg, _ := newCfg("HS256")
+		tok := jwtgo.New(jwtgo.SigningMethodHS256)
+		tok.Header["kid"] = clientID
+		tok.Claims = jwtgo.MapClaims{
+			"exp": time.Now().Add(time.Hour).Unix(),
+			"aud": clientID,
+		}
+		signed, err := tok.SignedString([]byte(clientSecret))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var claims jwtgo.MapClaims
+		if err := cfg.Validate(t.Context(), DummyRoleARN, signed, "", "", claims); err != nil {
+			t.Fatalf("legitimate HS256 token rejected: %v", err)
+		}
+	})
 }
 
 func TestJWT(t *testing.T) {

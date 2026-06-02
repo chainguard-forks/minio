@@ -132,15 +132,66 @@ const (
 	azpClaim = "azp"
 )
 
+// providerAllowsHMAC reports whether symmetric (HMAC, i.e. HS256/384/512)
+// id_token signing is permitted for the given provider.
+//
+// CVE-2026-33322 / GHSA-5cx5-wh4m-82fh: HMAC verification uses the ClientSecret
+// as the key. Permitting HMAC unconditionally enables a JWT algorithm-confusion
+// attack against the (overwhelmingly common) asymmetric deployments, where an
+// attacker who knows the ClientSecret can forge tokens. We therefore only allow
+// HMAC when the IdP's discovery document explicitly advertises an HMAC
+// id_token signing algorithm. If the discovery document does not list any
+// signing algorithms (HMAC nor asymmetric) we conservatively withhold HMAC,
+// since the secure default for OIDC is asymmetric signing.
+func providerAllowsHMAC(pCfg *providerCfg) bool {
+	for _, alg := range pCfg.DiscoveryDoc.IDTokenSigningAlgValuesSupported {
+		switch alg {
+		case "HS256", "HS384", "HS512":
+			return true
+		}
+	}
+	return false
+}
+
 // Validate - validates the id_token.
 func (r *Config) Validate(ctx context.Context, arn arn.ARN, token, accessToken, dsecs string, claims map[string]any) error {
+	pCfg, ok := r.arnProviderCfgsMap[arn]
+	if !ok {
+		return fmt.Errorf("Role %s does not exist", arn)
+	}
+
+	// CVE-2026-33322 / GHSA-5cx5-wh4m-82fh (JWT algorithm confusion):
+	//
+	// MinIO registers the OIDC ClientSecret as an HMAC verification key keyed
+	// by ClientID (see PopulatePublicKey) so that IdPs which sign id_tokens
+	// symmetrically (HS256/384/512) can be supported. However, the verification
+	// key is resolved purely from the attacker-controlled `kid` header and the
+	// accepted algorithms permitted every family unconditionally. An attacker
+	// who learns the ClientSecret could therefore forge a token of the shape
+	// {"alg":"HS256","kid":"<ClientID>"}, sign it with the ClientSecret, and
+	// have it verified against that same secret - even when the IdP actually
+	// signs tokens asymmetrically (RSA/ECDSA). golang-jwt only enforces
+	// ValidMethods, not a binding between the algorithm and the key type, so it
+	// does not stop this on its own.
+	//
+	// Mitigation: HMAC (symmetric) signing is only honoured when the IdP's
+	// discovery document advertises an HMAC id_token signing algorithm. For the
+	// common asymmetric deployments the HS* algorithms are removed from the set
+	// of accepted methods entirely, which prevents the ClientSecret from ever
+	// being used as a token verification key. We additionally bind the token's
+	// algorithm to the resolved key's type inside the keyfunc as defence in
+	// depth.
+	allowHMAC := providerAllowsHMAC(pCfg)
+
 	jp := new(jwtgo.Parser)
 	jp.ValidMethods = []string{
 		"RS256", "RS384", "RS512",
 		"ES256", "ES384", "ES512",
-		"HS256", "HS384", "HS512",
 		"RS3256", "RS3384", "RS3512",
 		"ES3256", "ES3384", "ES3512",
+	}
+	if allowHMAC {
+		jp.ValidMethods = append(jp.ValidMethods, "HS256", "HS384", "HS512")
 	}
 
 	keyFuncCallback := func(jwtToken *jwtgo.Token) (any, error) {
@@ -152,12 +203,32 @@ func (r *Config) Validate(ctx context.Context, arn arn.ARN, token, accessToken, 
 		if pubkey == nil {
 			return nil, fmt.Errorf("No public key found for kid %s", kid)
 		}
-		return pubkey, nil
-	}
 
-	pCfg, ok := r.arnProviderCfgsMap[arn]
-	if !ok {
-		return fmt.Errorf("Role %s does not exist", arn)
+		// CVE-2026-33322 / GHSA-5cx5-wh4m-82fh: bind the token's signing
+		// algorithm to the TYPE of the resolved verification key so that an
+		// asymmetric public key can never be (mis)used as an HMAC secret and a
+		// symmetric secret can never be used to satisfy an asymmetric token.
+		_, isHMACToken := jwtToken.Method.(*jwtgo.SigningMethodHMAC)
+		switch pubkey.(type) {
+		case []byte:
+			// Symmetric (HMAC) secret. Only acceptable when the token uses an
+			// HMAC algorithm AND the provider is configured to permit HMAC.
+			if !isHMACToken {
+				return nil, fmt.Errorf("signing method %q is not allowed for symmetric (HMAC) key kid %s", jwtToken.Method.Alg(), kid)
+			}
+			if !allowHMAC {
+				return nil, fmt.Errorf("HMAC signing is not permitted for provider with client ID %s; the IdP does not advertise an HMAC id_token signing algorithm", pCfg.ClientID)
+			}
+		default:
+			// Asymmetric public key (RSA/ECDSA/...): HMAC signing methods must
+			// never be accepted, otherwise the public key would be treated as
+			// an HMAC secret.
+			if isHMACToken {
+				return nil, fmt.Errorf("HMAC signing method %q is not allowed for asymmetric key kid %s", jwtToken.Method.Alg(), kid)
+			}
+		}
+
+		return pubkey, nil
 	}
 
 	mclaims := jwtgo.MapClaims(claims)
