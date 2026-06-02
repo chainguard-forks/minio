@@ -2247,7 +2247,7 @@ func (api objectAPIHandlers) PutObjectExtractHandler(w http.ResponseWriter, r *h
 	// if Content-Length is unknown/missing, deny the request
 	size := r.ContentLength
 	rAuthType := getRequestAuthType(r)
-	if rAuthType == authTypeStreamingSigned || rAuthType == authTypeStreamingSignedTrailer {
+	if rAuthType == authTypeStreamingSigned || rAuthType == authTypeStreamingSignedTrailer || rAuthType == authTypeStreamingUnsignedTrailer {
 		if sizeStr, ok := r.Header[xhttp.AmzDecodedContentLength]; ok {
 			if sizeStr[0] == "" {
 				writeErrorResponse(ctx, w, errorCodes.ToAPIErr(ErrMissingContentLength), r.URL)
@@ -2297,6 +2297,28 @@ func (api objectAPIHandlers) PutObjectExtractHandler(w http.ResponseWriter, r *h
 	case authTypeStreamingSigned, authTypeStreamingSignedTrailer:
 		// Initialize stream signature verifier.
 		reader, s3Err = newSignV4ChunkedReader(r, rAuthType == authTypeStreamingSignedTrailer)
+		if s3Err != ErrNone {
+			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Err), r.URL)
+			return
+		}
+	case authTypeStreamingUnsignedTrailer:
+		// CVE-2026-40344 (Vuln 1): the streaming-unsigned-trailer auth type was
+		// added upstream (PR #16484) to PutObjectHandler and PutObjectPartHandler
+		// but never wired into this Snowball auto-extract handler. Without this
+		// case the request fell through the switch with ZERO signature
+		// verification (isPutActionAllowed only checks the access key + IAM
+		// policy, not the cryptographic signature), allowing an attacker holding
+		// a valid access key but a fabricated Authorization signature to extract
+		// an arbitrary tar payload into the bucket.
+		//
+		// Mirror the protected handlers: wrap the body in the unsigned chunked
+		// reader, which verifies the request signature when credentials are
+		// present. Require signature verification whenever credentials are
+		// supplied via either the Authorization header or the X-Amz-Credential
+		// query parameter; otherwise an attacker could pass credentials through
+		// the query string and bypass signing entirely (CVE-2026-41145, Vuln 2).
+		hasCreds := r.Header.Get(xhttp.Authorization) != "" || r.Form.Get(xhttp.AmzCredential) != ""
+		reader, s3Err = newUnsignedV4ChunkedReader(r, true, hasCreds)
 		if s3Err != ErrNone {
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Err), r.URL)
 			return
