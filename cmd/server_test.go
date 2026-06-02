@@ -18,6 +18,7 @@
 package cmd
 
 import (
+	"archive/tar"
 	"bytes"
 	"context"
 	"encoding/xml"
@@ -129,6 +130,7 @@ func runAllTests(suite *TestSuiteCommon, c *check) {
 	suite.TestBucketSQSNotificationAMQP(c)
 	suite.TestUnsignedCVE(c)
 	suite.TestCVE202641145(c)
+	suite.TestCVE202640344SnowballExtract(c)
 	suite.TearDownSuite(c)
 }
 
@@ -483,6 +485,113 @@ func (s *TestSuiteCommon) TestCVE202641145(c *check) {
 	response, err = s.client.Do(legitReq)
 	c.Assert(err, nil)
 	c.Assert(response.StatusCode, http.StatusOK)
+}
+
+// TestCVE202640344SnowballExtract is a regression test for CVE-2026-40344
+// (Vuln 1): missing signature verification in the Snowball auto-extract handler
+// (PutObjectExtractHandler).
+//
+// When the STREAMING-UNSIGNED-PAYLOAD-TRAILER auth type was added upstream
+// (PR #16484) it was wired into PutObjectHandler and PutObjectPartHandler but
+// never into PutObjectExtractHandler. Its switch had no case for
+// authTypeStreamingUnsignedTrailer (and no default), so a request with that
+// content-sha256, the Snowball auto-extract header, and a valid access key but
+// a *fabricated* Authorization signature fell through with ZERO signature
+// verification — isPutActionAllowed only checks the access key + IAM policy,
+// not the cryptographic signature — and the tar payload was extracted into the
+// bucket.
+//
+// The fix adds the missing case so the body is wrapped in
+// newUnsignedV4ChunkedReader, which verifies the signature when credentials are
+// present (and via the hasCreds gate also defends against the CVE-2026-41145
+// query-string bypass).
+func (s *TestSuiteCommon) TestCVE202640344SnowballExtract(c *check) {
+	c.Helper()
+
+	bucketName := getRandomBucketName()
+	request, err := newTestSignedRequest(http.MethodPut, getMakeBucketURL(s.endPoint, bucketName),
+		0, nil, s.accessKey, s.secretKey, s.signer)
+	c.Assert(err, nil)
+	response, err := s.client.Do(request)
+	c.Assert(err, nil)
+	c.Assert(response.StatusCode, http.StatusOK)
+
+	// Build a small tar payload containing a single file. This is the
+	// "decoded" content that the extract handler would unpack into the bucket.
+	fileName := "extracted.txt"
+	fileData := []byte("snowball-payload")
+	var tarBuf bytes.Buffer
+	tw := tar.NewWriter(&tarBuf)
+	c.Assert(tw.WriteHeader(&tar.Header{
+		Name: fileName,
+		Mode: 0o600,
+		Size: int64(len(fileData)),
+	}), nil)
+	_, err = tw.Write(fileData)
+	c.Assert(err, nil)
+	c.Assert(tw.Close(), nil)
+	tarBytes := tarBuf.Bytes()
+
+	// aws-chunked encoding of the tar payload as a single chunk.
+	chunkedBody := fmt.Sprintf("%x\r\n%s\r\n0\r\n", len(tarBytes), tarBytes)
+
+	// --- Attack case: STREAMING-UNSIGNED-PAYLOAD-TRAILER snowball extract with a
+	// fabricated Authorization signature. Before the fix this fell through the
+	// switch unverified and the tar was extracted; now it must be rejected.
+	attackReq, err := http.NewRequest(http.MethodPut,
+		getPutObjectURL(s.endPoint, bucketName, "attack.tar"), nil)
+	c.Assert(err, nil)
+	attackReq.Body = io.NopCloser(strings.NewReader(chunkedBody))
+	attackReq.ContentLength = int64(len(chunkedBody))
+	attackReq.Header.Set("x-amz-content-sha256", unsignedPayloadTrailer)
+	attackReq.Header.Set("X-Amz-Decoded-Content-Length", fmt.Sprintf("%d", len(tarBytes)))
+	attackReq.Header.Set("Content-Encoding", "aws-chunked")
+	attackReq.Header.Set(xhttp.AmzSnowballExtract, "true")
+	// Sign first to obtain a well-formed credential scope/date, then clobber the
+	// signature portion of the Authorization header so the access key is valid
+	// but the signature is fabricated.
+	err = signRequestV4(attackReq, s.accessKey, s.secretKey)
+	c.Assert(err, nil)
+	auth := attackReq.Header.Get("Authorization")
+	c.Assert(strings.Contains(auth, "Signature="), true)
+	attackReq.Header.Set("Authorization",
+		regexp.MustCompile(`Signature=[0-9a-f]+`).ReplaceAllString(auth, "Signature="+strings.Repeat("0", 64)))
+
+	response, err = s.client.Do(attackReq)
+	c.Assert(err, nil)
+	if response.StatusCode == http.StatusOK {
+		c.Fatal("CVE-2026-40344: Snowball extract PUT with a fabricated signature was accepted; signature verification is missing in PutObjectExtractHandler")
+	}
+
+	// --- Legitimate case: same streaming content type and snowball header with a
+	// proper signature. Ensures the fix does not break valid extract uploads.
+	legitReq, err := http.NewRequest(http.MethodPut,
+		getPutObjectURL(s.endPoint, bucketName, "legit.tar"), nil)
+	c.Assert(err, nil)
+	legitReq.Body = io.NopCloser(strings.NewReader(chunkedBody))
+	legitReq.ContentLength = int64(len(chunkedBody))
+	legitReq.Header.Set("x-amz-content-sha256", unsignedPayloadTrailer)
+	legitReq.Header.Set("X-Amz-Decoded-Content-Length", fmt.Sprintf("%d", len(tarBytes)))
+	legitReq.Header.Set("Content-Encoding", "aws-chunked")
+	legitReq.Header.Set(xhttp.AmzSnowballExtract, "true")
+	err = signRequestV4(legitReq, s.accessKey, s.secretKey)
+	c.Assert(err, nil)
+
+	response, err = s.client.Do(legitReq)
+	c.Assert(err, nil)
+	c.Assert(response.StatusCode, http.StatusOK)
+
+	// The extracted file should now exist as its own object in the bucket.
+	getReq, err := newTestSignedRequest(http.MethodGet,
+		getGetObjectURL(s.endPoint, bucketName, fileName),
+		0, nil, s.accessKey, s.secretKey, s.signer)
+	c.Assert(err, nil)
+	response, err = s.client.Do(getReq)
+	c.Assert(err, nil)
+	c.Assert(response.StatusCode, http.StatusOK)
+	got, err := io.ReadAll(response.Body)
+	c.Assert(err, nil)
+	c.Assert(string(got), string(fileData))
 }
 
 func (s *TestSuiteCommon) TestBucketSQSNotificationAMQP(c *check) {
