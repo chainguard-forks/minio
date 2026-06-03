@@ -174,12 +174,12 @@ func (r *Config) Validate(ctx context.Context, arn arn.ARN, token, accessToken, 
 	// ValidMethods, not a binding between the algorithm and the key type, so it
 	// does not stop this on its own.
 	//
-	// Mitigation: HMAC (symmetric) signing is only honoured when the IdP's
+	// Mitigation: HMAC (symmetric) signing is only honored when the IdP's
 	// discovery document advertises an HMAC id_token signing algorithm. For the
 	// common asymmetric deployments the HS* algorithms are removed from the set
 	// of accepted methods entirely, which prevents the ClientSecret from ever
 	// being used as a token verification key. We additionally bind the token's
-	// algorithm to the resolved key's type inside the keyfunc as defence in
+	// algorithm to the resolved key's type inside the keyfunc as defense in
 	// depth.
 	allowHMAC := providerAllowsHMAC(pCfg)
 

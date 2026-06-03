@@ -136,7 +136,7 @@ func TestJWTHMACType(t *testing.T) {
 		ClientSecret: "WNGvKVyyNmXq0TraSvjaDN9CtpFgx35IXtGEffMCPR0",
 		// A symmetric (HMAC) IdP advertises an HS* id_token signing algorithm in
 		// its discovery document. Required after the CVE-2026-33322 fix for the
-		// ClientSecret to be honoured as an HMAC verification key.
+		// ClientSecret to be honored as an HMAC verification key.
 		DiscoveryDoc: DiscoveryDoc{
 			IDTokenSigningAlgValuesSupported: []string{"HS256"},
 		},
