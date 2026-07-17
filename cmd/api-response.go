@@ -18,10 +18,12 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"path"
@@ -1062,4 +1064,23 @@ func (w *trackingResponseWriter) Write(b []byte) (int, error) {
 
 func (w *trackingResponseWriter) Unwrap() http.ResponseWriter {
 	return w.ResponseWriter
+}
+
+// Flush forwards a flush to the wrapped ResponseWriter. Without this the
+// wrapper does not satisfy http.Flusher, which breaks the flush chain for
+// streaming responses such as the bucket notification listener, leaving
+// streamed bytes buffered and never sent to the client.
+func (w *trackingResponseWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+// Hijack forwards a hijack to the wrapped ResponseWriter so that handlers
+// relying on connection hijacking keep working through the wrapper.
+func (w *trackingResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if h, ok := w.ResponseWriter.(http.Hijacker); ok {
+		return h.Hijack()
+	}
+	return nil, nil, fmt.Errorf("hijack not supported by underlying ResponseWriter")
 }

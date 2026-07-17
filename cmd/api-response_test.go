@@ -18,7 +18,9 @@
 package cmd
 
 import (
+	"bufio"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -130,7 +132,8 @@ func TestGetURLScheme(t *testing.T) {
 func TestTrackingResponseWriter(t *testing.T) {
 	rw := httptest.NewRecorder()
 	trw := &trackingResponseWriter{ResponseWriter: rw}
-	trw.WriteHeader(123)
+	// Use a 2xx status: Go 1.26 httptest rejects a body write after a 1xx code.
+	trw.WriteHeader(234)
 	if !trw.headerWritten {
 		t.Fatal("headerWritten was not set by WriteHeader call")
 	}
@@ -142,7 +145,7 @@ func TestTrackingResponseWriter(t *testing.T) {
 
 	// Check that WriteHeader and Write were called on the underlying response writer
 	resp := rw.Result()
-	if resp.StatusCode != 123 {
+	if resp.StatusCode != 234 {
 		t.Fatalf("unexpected status: %v", resp.StatusCode)
 	}
 	body, err := io.ReadAll(resp.Body)
@@ -156,6 +159,54 @@ func TestTrackingResponseWriter(t *testing.T) {
 	// Check that Unwrap works
 	if trw.Unwrap() != rw {
 		t.Fatalf("Unwrap returned wrong result: %v", trw.Unwrap())
+	}
+}
+
+// hijackableResponseWriter is a ResponseWriter that supports hijacking, used to
+// verify that trackingResponseWriter forwards Hijack to the wrapped writer.
+type hijackableResponseWriter struct {
+	*httptest.ResponseRecorder
+	hijacked bool
+}
+
+func (h *hijackableResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h.hijacked = true
+	return nil, nil, nil
+}
+
+// TestTrackingResponseWriterFlushHijack guards against a regression where
+// trackingResponseWriter did not forward Flush or Hijack. That broke the flush
+// chain for streaming responses such as ListenBucketNotification, whose chunked
+// event-stream never reached the client.
+func TestTrackingResponseWriterFlushHijack(t *testing.T) {
+	// The wrapper must satisfy both interfaces so it does not silently disable
+	// flushing or hijacking when it wraps a writer that supports them.
+	var _ http.Flusher = (*trackingResponseWriter)(nil)
+	var _ http.Hijacker = (*trackingResponseWriter)(nil)
+
+	// Flush must forward to the wrapped writer.
+	rw := httptest.NewRecorder()
+	trw := &trackingResponseWriter{ResponseWriter: rw}
+	trw.Flush()
+	if !rw.Flushed {
+		t.Fatal("Flush was not forwarded to the underlying ResponseWriter")
+	}
+
+	// Hijack must forward when the wrapped writer supports hijacking.
+	hj := &hijackableResponseWriter{ResponseRecorder: httptest.NewRecorder()}
+	trw = &trackingResponseWriter{ResponseWriter: hj}
+	if _, _, err := trw.Hijack(); err != nil {
+		t.Fatalf("Hijack unexpectedly failed: %v", err)
+	}
+	if !hj.hijacked {
+		t.Fatal("Hijack was not forwarded to the underlying ResponseWriter")
+	}
+
+	// Hijack must return an error, not panic, when the wrapped writer does not
+	// support hijacking.
+	trw = &trackingResponseWriter{ResponseWriter: httptest.NewRecorder()}
+	if _, _, err := trw.Hijack(); err == nil {
+		t.Fatal("expected an error hijacking a non-hijackable ResponseWriter")
 	}
 }
 
