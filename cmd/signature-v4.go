@@ -57,6 +57,14 @@ const (
 	serviceSTS serviceType = "sts"
 )
 
+// amzSignatureAge is a server-internal request header. doesPresignedSignatureMatch
+// sets it once a presigned request has verified, and bucket policy evaluation reads
+// it for the signatureAge condition. The client is never allowed to supply it, so it
+// is dropped before verification. Dropping it also means a second verification of
+// the same request (PutObject verifies the signature again for the payload hash)
+// does not trip the unsigned x-amz-* header check in extractSignedHeaders.
+const amzSignatureAge = "x-amz-signature-age"
+
 // getCanonicalHeaders generate a list of request headers with their values
 func getCanonicalHeaders(signedHeaders http.Header) string {
 	var headers []string
@@ -223,6 +231,9 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 		return s3Err
 	}
 
+	// Server-owned header, never trusted from the client (see amzSignatureAge).
+	r.Header.Del(amzSignatureAge)
+
 	// Extract all the signed headers along with its values.
 	extractedSignedHeaders, errCode := extractSignedHeaders(pSignValues.SignedHeaders, r)
 	if errCode != ErrNone {
@@ -335,7 +346,7 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 		return ErrSignatureDoesNotMatch
 	}
 
-	r.Header.Set("x-amz-signature-age", strconv.FormatInt(UTCNow().Sub(pSignValues.Date).Milliseconds(), 10))
+	r.Header.Set(amzSignatureAge, strconv.FormatInt(UTCNow().Sub(pSignValues.Date).Milliseconds(), 10))
 
 	return ErrNone
 }
@@ -356,6 +367,9 @@ func doesSignatureMatch(hashedPayload string, r *http.Request, region string, st
 	if err != ErrNone {
 		return err
 	}
+
+	// Server-owned header, never trusted from the client (see amzSignatureAge).
+	r.Header.Del(amzSignatureAge)
 
 	// Extract all the signed headers along with its values.
 	extractedSignedHeaders, errCode := extractSignedHeaders(signV4Values.SignedHeaders, r)

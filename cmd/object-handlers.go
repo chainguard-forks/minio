@@ -3228,11 +3228,21 @@ func (api objectAPIHandlers) PutObjectTaggingHandler(w http.ResponseWriter, r *h
 		return
 	}
 
+	// Authenticate before touching request headers: signature verification
+	// rejects any x-amz-* header it did not sign, and X-Amz-Tagging below is
+	// set by the server purely so policy conditions can see the new tags.
+	logger.GetReqInfo(ctx).BucketName = bucket
+	logger.GetReqInfo(ctx).ObjectName = object
+	if s3Error := authenticateRequest(ctx, r, policy.PutObjectTaggingAction); s3Error != ErrNone {
+		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
+		return
+	}
+
 	// Set this such that authorization policies can be applied on the object tags.
 	r.Header.Set(xhttp.AmzObjectTagging, tags.String())
 
 	// Allow putObjectTagging if policy action is set
-	if s3Error := checkRequestAuthType(ctx, r, policy.PutObjectTaggingAction, bucket, object); s3Error != ErrNone {
+	if s3Error := authorizeRequest(ctx, r, policy.PutObjectTaggingAction); s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
 		return
 	}
@@ -3376,13 +3386,21 @@ func (api objectAPIHandlers) DeleteObjectTaggingHandler(w http.ResponseWriter, r
 		return
 	}
 
+	// Authenticate before touching request headers (see PutObjectTaggingHandler).
+	logger.GetReqInfo(ctx).BucketName = bucket
+	logger.GetReqInfo(ctx).ObjectName = object
+	if s3Error := authenticateRequest(ctx, r, policy.DeleteObjectTaggingAction); s3Error != ErrNone {
+		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
+		return
+	}
+
 	if userTags := oi.UserTags; userTags != "" {
 		// Set this such that authorization policies can be applied on the object tags.
 		r.Header.Set(xhttp.AmzObjectTagging, oi.UserTags)
 	}
 
 	// Allow deleteObjectTagging if policy action is set
-	if s3Error := checkRequestAuthType(ctx, r, policy.DeleteObjectTaggingAction, bucket, object); s3Error != ErrNone {
+	if s3Error := authorizeRequest(ctx, r, policy.DeleteObjectTaggingAction); s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
 		return
 	}

@@ -303,6 +303,94 @@ func TestExtractSignedHeaders(t *testing.T) {
 	}
 }
 
+// TestExtractSignedHeadersRejectsUnsignedAmzHeaders - every x-amz-* header
+// present on the request must be in the signed headers list, except
+// x-amz-content-sha256 which is bound into the canonical request as the
+// payload hash.
+func TestExtractSignedHeadersRejectsUnsignedAmzHeaders(t *testing.T) {
+	newReq := func(headers map[string]string) *http.Request {
+		r, err := http.NewRequest(http.MethodPut, "http://play.min.io:9000/dst/target", nil)
+		if err != nil {
+			t.Fatal("Unable to create http.Request :", err)
+		}
+		for k, v := range headers {
+			r.Header.Set(k, v)
+		}
+		return r
+	}
+
+	testCases := []struct {
+		name          string
+		signedHeaders []string
+		headers       map[string]string
+		expected      APIErrorCode
+	}{
+		{
+			name:          "unsigned x-amz-copy-source",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"X-Amz-Copy-Source": "/src/secret"},
+			expected:      ErrUnsignedHeaders,
+		},
+		{
+			name:          "unsigned x-amz-copy-source with empty value",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"X-Amz-Copy-Source": ""},
+			expected:      ErrUnsignedHeaders,
+		},
+		{
+			name:          "unsigned x-amz-meta header",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"X-Amz-Meta-Foo": "bar"},
+			expected:      ErrUnsignedHeaders,
+		},
+		{
+			name:          "unsigned x-amz-date",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"X-Amz-Date": UTCNow().Format(iso8601Format)},
+			expected:      ErrUnsignedHeaders,
+		},
+		{
+			name:          "signed x-amz-copy-source",
+			signedHeaders: []string{"host", "x-amz-copy-source"},
+			headers:       map[string]string{"X-Amz-Copy-Source": "/src/secret"},
+			expected:      ErrNone,
+		},
+		{
+			name:          "signed header listed with non-lowercase name",
+			signedHeaders: []string{"host", "X-Amz-Copy-Source"},
+			headers:       map[string]string{"X-Amz-Copy-Source": "/src/secret"},
+			expected:      ErrNone,
+		},
+		{
+			name:          "one signed and one unsigned x-amz header",
+			signedHeaders: []string{"host", "x-amz-copy-source"},
+			headers:       map[string]string{"X-Amz-Copy-Source": "/src/secret", "X-Amz-Copy-Source-Range": "bytes=0-1"},
+			expected:      ErrUnsignedHeaders,
+		},
+		{
+			name:          "unsigned x-amz-content-sha256 is exempt",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"X-Amz-Content-Sha256": "1234abcd"},
+			expected:      ErrNone,
+		},
+		{
+			name:          "unsigned non-amz headers are not affected",
+			signedHeaders: []string{"host"},
+			headers:       map[string]string{"Content-Type": "text/plain", "User-Agent": "test", "X-Custom": "x"},
+			expected:      ErrNone,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			_, errCode := extractSignedHeaders(testCase.signedHeaders, newReq(testCase.headers))
+			if errCode != testCase.expected {
+				t.Errorf("Expected the APIErrorCode to be %d, but got %d", testCase.expected, errCode)
+			}
+		})
+	}
+}
+
 // TestSignV4TrimAll - tests the logic of TrimAll() function
 func TestSignV4TrimAll(t *testing.T) {
 	testCases := []struct {

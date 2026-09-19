@@ -206,6 +206,31 @@ func extractSignedHeaders(signedHeaders []string, r *http.Request) (http.Header,
 	if !slices.Contains(signedHeaders, "host") {
 		return nil, ErrUnsignedHeaders
 	}
+	// Signature V4 requires every x-amz-* header present on the request to be
+	// covered by the signature. Historically this function only walked the
+	// client-supplied SignedHeaders list, so an x-amz-* header that arrived
+	// outside that list was never looked at and could still steer the request:
+	// an unsigned x-amz-copy-source on a presigned PUT for one object turned
+	// it into a CopyObject that ran as the signer, letting the holder of an
+	// upload URL read any object the signing key could reach. AWS S3 rejects
+	// such requests with AccessDenied; so do we.
+	//
+	// x-amz-content-sha256 is exempt: its value is bound into the canonical
+	// request as the payload hash, so tampering with it already fails
+	// signature verification.
+	signedSet := make(map[string]struct{}, len(signedHeaders))
+	for _, header := range signedHeaders {
+		signedSet[strings.ToLower(header)] = struct{}{}
+	}
+	for header := range reqHeaders {
+		lowerHeader := strings.ToLower(header)
+		if !strings.HasPrefix(lowerHeader, "x-amz-") || strings.EqualFold(header, xhttp.AmzContentSha256) {
+			continue
+		}
+		if _, ok := signedSet[lowerHeader]; !ok {
+			return nil, ErrUnsignedHeaders
+		}
+	}
 	extractedSignedHeaders := make(http.Header)
 	for _, header := range signedHeaders {
 		// `host` will not be found in the headers, can be found in r.Host.

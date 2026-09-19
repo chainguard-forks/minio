@@ -122,6 +122,9 @@ func calculateSeedSignature(r *http.Request, trailers bool) (cred auth.Credentia
 		return cred, "", "", time.Time{}, ErrContentSHA256Mismatch
 	}
 
+	// Server-owned header, never trusted from the client (see amzSignatureAge).
+	r.Header.Del(amzSignatureAge)
+
 	// Extract all the signed headers along with its values.
 	extractedSignedHeaders, errCode := extractSignedHeaders(signV4Values.SignedHeaders, r)
 	if errCode != ErrNone {
