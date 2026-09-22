@@ -146,9 +146,9 @@ func getConditionValues(r *http.Request, lc string, cred auth.Credentials) map[s
 	}
 
 	cloneHeader := r.Header.Clone()
-	if v := cloneHeader.Get("x-amz-signature-age"); v != "" {
+	if v := cloneHeader.Get(amzSignatureAge); v != "" {
 		args["signatureAge"] = []string{v}
-		cloneHeader.Del("x-amz-signature-age")
+		cloneHeader.Del(amzSignatureAge)
 	}
 
 	if userTags := cloneHeader.Get(xhttp.AmzObjectTagging); userTags != "" {

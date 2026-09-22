@@ -1744,7 +1744,7 @@ func testAPICopyObjectPartHandlerSanity(obj ObjectLayer, instanceType, bucketNam
 
 		// construct HTTP request for copy object.
 		var req *http.Request
-		req, err = newTestSignedRequestV4(http.MethodPut, cpPartURL, 0, nil, credentials.AccessKey, credentials.SecretKey, nil)
+		req, err = newTestRequest(http.MethodPut, cpPartURL, 0, nil)
 		if err != nil {
 			t.Fatalf("Test failed to create HTTP request for copy object part: <ERROR> %v", err)
 		}
@@ -1757,6 +1757,10 @@ func testAPICopyObjectPartHandlerSanity(obj ObjectLayer, instanceType, bucketNam
 		// Call the ServeHTTP to execute the handler, `func (api objectAPIHandlers) CopyObjectHandler` handles the request.
 		a = globalMinPartSize + 1
 		b = len(bytesData[0].byteData) - 1
+		// Sign only once every X-Amz-* header is in place: unsigned x-amz-* headers are rejected.
+		if err = signRequestV4(req, credentials.AccessKey, credentials.SecretKey); err != nil {
+			t.Fatalf("Test failed to sign HTTP request for copy object part: <ERROR> %v", err)
+		}
 		apiRouter.ServeHTTP(rec, req)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("Test failed to create HTTP request for copy %d", rec.Code)
@@ -2085,11 +2089,11 @@ func testAPICopyObjectPartHandler(obj ObjectLayer, instanceType, bucketName stri
 		switch {
 		case !testCase.invalidPartNumber || !testCase.maximumPartNumber:
 			// construct HTTP request for copy object.
-			req, err = newTestSignedRequestV4(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "1"), 0, nil, testCase.accessKey, testCase.secretKey, nil)
+			req, err = newTestRequest(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "1"), 0, nil)
 		case testCase.invalidPartNumber:
-			req, err = newTestSignedRequestV4(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "abc"), 0, nil, testCase.accessKey, testCase.secretKey, nil)
+			req, err = newTestRequest(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "abc"), 0, nil)
 		case testCase.maximumPartNumber:
-			req, err = newTestSignedRequestV4(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "99999"), 0, nil, testCase.accessKey, testCase.secretKey, nil)
+			req, err = newTestRequest(http.MethodPut, getCopyObjectPartURL("", testCase.bucketName, testObject, testCase.uploadID, "99999"), 0, nil)
 		}
 		if err != nil {
 			t.Fatalf("Test %d: Failed to create HTTP request for copy Object: <ERROR> %v", i+1, err)
@@ -2109,6 +2113,12 @@ func testAPICopyObjectPartHandler(obj ObjectLayer, instanceType, bucketName stri
 
 		// Since `apiRouter` satisfies `http.Handler` it has a ServeHTTP to execute the logic of the handler.
 		// Call the ServeHTTP to execute the handler, `func (api objectAPIHandlers) CopyObjectHandler` handles the request.
+		// Sign only once every X-Amz-* header is in place: unsigned x-amz-* headers are rejected.
+		if testCase.accessKey != "" {
+			if err = signRequestV4(req, testCase.accessKey, testCase.secretKey); err != nil {
+				t.Fatalf("Test %d: Failed to sign HTTP request for copy Object: <ERROR> %v", i+1, err)
+			}
+		}
 		apiRouter.ServeHTTP(rec, req)
 		// Assert the response code with the expected status.
 		if rec.Code != testCase.expectedRespStatus {
@@ -2501,8 +2511,7 @@ func testAPICopyObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 		// initialize HTTP NewRecorder, this records any mutations to response writer inside the handler.
 		rec := httptest.NewRecorder()
 		// construct HTTP request for copy object.
-		req, err = newTestSignedRequestV4(http.MethodPut, getCopyObjectURL("", testCase.bucketName, testCase.newObjectName),
-			0, nil, testCase.accessKey, testCase.secretKey, nil)
+		req, err = newTestRequest(http.MethodPut, getCopyObjectURL("", testCase.bucketName, testCase.newObjectName), 0, nil)
 		if err != nil {
 			t.Fatalf("Test %d: Failed to create HTTP request for copy Object: <ERROR> %v", i, err)
 		}
@@ -2535,6 +2544,12 @@ func testAPICopyObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 		}
 		// Since `apiRouter` satisfies `http.Handler` it has a ServeHTTP to execute the logic of the handler.
 		// Call the ServeHTTP to execute the handler, `func (api objectAPIHandlers) CopyObjectHandler` handles the request.
+		// Sign only once every X-Amz-* header is in place: unsigned x-amz-* headers are rejected.
+		if testCase.accessKey != "" {
+			if err = signRequestV4(req, testCase.accessKey, testCase.secretKey); err != nil {
+				t.Fatalf("Test %d: Failed to sign HTTP request for copy Object: <ERROR> %v", i, err)
+			}
+		}
 		apiRouter.ServeHTTP(rec, req)
 		// Assert the response code with the expected status.
 		if rec.Code != testCase.expectedRespStatus {

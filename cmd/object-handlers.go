@@ -495,9 +495,12 @@ func (api objectAPIHandlers) getObjectHandler(ctx context.Context, objectAPI Obj
 		QueueReplicationHeal(ctx, bucket, gr.ObjInfo, 0)
 	}
 
-	// filter object lock metadata if permission does not permit
-	getRetPerms := checkRequestAuthType(ctx, r, policy.GetObjectRetentionAction, bucket, object)
-	legalHoldPerms := checkRequestAuthType(ctx, r, policy.GetObjectLegalHoldAction, bucket, object)
+	// filter object lock metadata if permission does not permit.
+	// authenticateRequest already ran at the top of this handler; re-running it
+	// would re-verify the signature against a request we have since stamped
+	// X-Amz-Tagging onto, which the unsigned x-amz-* check rejects.
+	getRetPerms := authorizeRequest(ctx, r, policy.GetObjectRetentionAction)
+	legalHoldPerms := authorizeRequest(ctx, r, policy.GetObjectLegalHoldAction)
 
 	// filter object lock metadata if permission does not permit
 	objInfo.UserDefined = objectlock.FilterObjectLockMetadata(objInfo.UserDefined, getRetPerms != ErrNone, legalHoldPerms != ErrNone)
@@ -906,9 +909,10 @@ func (api objectAPIHandlers) headObjectHandler(ctx context.Context, objectAPI Ob
 		QueueReplicationHeal(ctx, bucket, objInfo, 0)
 	}
 
-	// filter object lock metadata if permission does not permit
-	getRetPerms := checkRequestAuthType(ctx, r, policy.GetObjectRetentionAction, bucket, object)
-	legalHoldPerms := checkRequestAuthType(ctx, r, policy.GetObjectLegalHoldAction, bucket, object)
+	// filter object lock metadata if permission does not permit.
+	// authenticateRequest already ran at the top of this handler (see getObjectHandler).
+	getRetPerms := authorizeRequest(ctx, r, policy.GetObjectRetentionAction)
+	legalHoldPerms := authorizeRequest(ctx, r, policy.GetObjectLegalHoldAction)
 
 	// filter object lock metadata if permission does not permit
 	objInfo.UserDefined = objectlock.FilterObjectLockMetadata(objInfo.UserDefined, getRetPerms != ErrNone, legalHoldPerms != ErrNone)
@@ -3228,11 +3232,21 @@ func (api objectAPIHandlers) PutObjectTaggingHandler(w http.ResponseWriter, r *h
 		return
 	}
 
+	// Authenticate before touching request headers: signature verification
+	// rejects any x-amz-* header it did not sign, and X-Amz-Tagging below is
+	// set by the server purely so policy conditions can see the new tags.
+	logger.GetReqInfo(ctx).BucketName = bucket
+	logger.GetReqInfo(ctx).ObjectName = object
+	if s3Error := authenticateRequest(ctx, r, policy.PutObjectTaggingAction); s3Error != ErrNone {
+		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
+		return
+	}
+
 	// Set this such that authorization policies can be applied on the object tags.
 	r.Header.Set(xhttp.AmzObjectTagging, tags.String())
 
 	// Allow putObjectTagging if policy action is set
-	if s3Error := checkRequestAuthType(ctx, r, policy.PutObjectTaggingAction, bucket, object); s3Error != ErrNone {
+	if s3Error := authorizeRequest(ctx, r, policy.PutObjectTaggingAction); s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
 		return
 	}
@@ -3376,13 +3390,21 @@ func (api objectAPIHandlers) DeleteObjectTaggingHandler(w http.ResponseWriter, r
 		return
 	}
 
+	// Authenticate before touching request headers (see PutObjectTaggingHandler).
+	logger.GetReqInfo(ctx).BucketName = bucket
+	logger.GetReqInfo(ctx).ObjectName = object
+	if s3Error := authenticateRequest(ctx, r, policy.DeleteObjectTaggingAction); s3Error != ErrNone {
+		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
+		return
+	}
+
 	if userTags := oi.UserTags; userTags != "" {
 		// Set this such that authorization policies can be applied on the object tags.
 		r.Header.Set(xhttp.AmzObjectTagging, oi.UserTags)
 	}
 
 	// Allow deleteObjectTagging if policy action is set
-	if s3Error := checkRequestAuthType(ctx, r, policy.DeleteObjectTaggingAction, bucket, object); s3Error != ErrNone {
+	if s3Error := authorizeRequest(ctx, r, policy.DeleteObjectTaggingAction); s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
 		return
 	}

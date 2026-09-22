@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/http"
 	"slices"
@@ -205,6 +206,40 @@ func extractSignedHeaders(signedHeaders []string, r *http.Request) (http.Header,
 	// if not return ErrUnsignedHeaders. "host" is mandatory.
 	if !slices.Contains(signedHeaders, "host") {
 		return nil, ErrUnsignedHeaders
+	}
+	// Signature V4 requires every x-amz-* header present on the request to be
+	// covered by the signature. Historically this function only walked the
+	// client-supplied SignedHeaders list, so an x-amz-* header that arrived
+	// outside that list was never looked at and could still steer the request:
+	// an unsigned x-amz-copy-source on a presigned PUT for one object turned
+	// it into a CopyObject that ran as the signer, letting the holder of an
+	// upload URL read any object the signing key could reach. AWS S3 rejects
+	// such requests with AccessDenied; so do we.
+	//
+	// x-amz-content-sha256 is exempt: its value is bound into the canonical
+	// request as the payload hash, so tampering with it already fails
+	// signature verification. Note that this header also selects the verifier:
+	// getRequestAuthType dispatches on its STREAMING-* sentinel values before
+	// any signature is checked. An unsigned sentinel added to a presigned URL
+	// therefore re-routes the request to a streaming verifier, and it is that
+	// verifier's requirement for an Authorization header (which a presigned
+	// request does not carry) that makes it fail closed, not the payload-hash
+	// binding. TestSigV4RejectsUnsignedAmzHeaders pins this.
+	signedSet := make(map[string]struct{}, len(signedHeaders))
+	for _, header := range signedHeaders {
+		signedSet[strings.ToLower(header)] = struct{}{}
+	}
+	for header := range reqHeaders {
+		lowerHeader := strings.ToLower(header)
+		if !strings.HasPrefix(lowerHeader, "x-amz-") || strings.EqualFold(header, xhttp.AmzContentSha256) {
+			continue
+		}
+		if _, ok := signedSet[lowerHeader]; !ok {
+			// Log the header name (never its value) so that a proxy adding its
+			// own x-amz-* headers after the client has signed can be identified.
+			logger.LogIf(r.Context(), "signature", fmt.Errorf("request carries unsigned header %s; Signature V4 requires every x-amz-* header to be signed", header))
+			return nil, ErrUnsignedHeaders
+		}
 	}
 	extractedSignedHeaders := make(http.Header)
 	for _, header := range signedHeaders {
