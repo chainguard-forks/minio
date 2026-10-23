@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.8
 
 require (
-	github.com/klauspost/compress v1.17.11
+	github.com/klauspost/compress v1.18.7
 	github.com/klauspost/filepathx v1.1.1
 	github.com/minio/colorjson v1.0.8
 	github.com/minio/madmin-go/v3 v3.0.88
