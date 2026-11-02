@@ -27,6 +27,24 @@ done
 
 ./mc ready "${ALIAS_NAME}"
 
+# mc ready is satisfied at quorum while drives are still joining the cluster.
+# Objects written before every drive is online start short of shards, and the
+# healing tests then see more damage than they induce. Wait for all drives.
+TIMEOUT=60
+while true; do
+	if [[ ${TIMEOUT} -le 0 ]]; then
+		echo retry: timeout while waiting for all drives to come online
+		exit 1
+	fi
+	INFO=$(./mc admin info --json "${ALIAS_NAME}")
+	ONLINE=$(echo "${INFO}" | jq -r '.info.backend.onlineDisks // 0')
+	OFFLINE=$(echo "${INFO}" | jq -r '.info.backend.offlineDisks // 0')
+	[[ ${ONLINE} -gt 0 && ${OFFLINE} -eq 0 ]] && break
+	TIMEOUT=$((TIMEOUT - 1))
+	sleep 1
+done
+echo "all ${ONLINE} drives online"
+
 ./mc mb "${ALIAS_NAME}"/"${BUCKET}"
 rm -rf "${SRC_DIR}" "${INLINED_DIR}" "${DEST_DIR}" && mkdir -p "${SRC_DIR}" "${INLINED_DIR}" "${DEST_DIR}"
 for idx in {1..10}; do
