@@ -85,8 +85,7 @@ export MC_HOST_minio2=https://minio:minio123@localhost:9002
 echo -n "Preparing test data ..."
 mkdir -p /tmp/data
 echo "Hello World" >/tmp/data/obj
-touch /tmp/data/mpartobj
-shred -s 500M /tmp/data/mpartobj
+head -c 500M /dev/urandom >/tmp/data/mpartobj
 echo "done"
 
 # Add replication site

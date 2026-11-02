@@ -231,8 +231,9 @@ function __init__() {
 	# remove mc source.
 	purge "${MC_BUILD_DIR}"
 
-	shred -n 1 -s 1M - 1>"$FILE_1_MB" 2>/dev/null
-	shred -n 1 -s 65M - 1>"$FILE_65_MB" 2>/dev/null
+	# uutils coreutils (Ubuntu 26.04 runners) does not write to stdout for "-"; head -c works with both.
+	head -c 1M /dev/urandom >"$FILE_1_MB"
+	head -c 65M /dev/urandom >"$FILE_65_MB"
 
 	## version is purposefully set to '3' for minio to migrate configuration file
 	echo '{"version": "3", "credential": {"accessKey": "minio", "secretKey": "minio123"}, "region": "us-east-1"}' >"$MINIO_CONFIG_DIR/config.json"
