@@ -4,7 +4,7 @@
 # mc (from Wolfi) is what the compose healthchecks run ("mc ready local"); and
 # bash is installed as /bin/sh because, as on the previous base, the tests drive
 # the containers with "/bin/sh -c" scripts that rely on brace expansion.
-FROM cgr.dev/chainguard/wolfi-base:latest
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:94fa13e26d449f7d78dbcd02d12ea37a0da80d24fcc3e1f17b95d515dec607a7
 RUN apk add --no-cache bash coreutils ca-certificates-bundle mc && \
     ln -sf /bin/bash /bin/sh
 
