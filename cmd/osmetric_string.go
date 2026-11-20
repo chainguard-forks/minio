@@ -34,8 +34,9 @@ const _osMetric_name = "RemoveAllMkdirAllMkdirRenameOpenFileWOpenFileROpenFileWF
 var _osMetric_index = [...]uint8{0, 9, 17, 22, 28, 37, 46, 57, 68, 72, 88, 93, 99, 103, 109, 115, 125, 134, 138, 142}
 
 func (i osMetric) String() string {
-	if i >= osMetric(len(_osMetric_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_osMetric_index)-1 {
 		return "osMetric(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _osMetric_name[_osMetric_index[i]:_osMetric_index[i+1]]
+	return _osMetric_name[_osMetric_index[idx]:_osMetric_index[idx+1]]
 }

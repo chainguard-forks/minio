@@ -96,8 +96,9 @@ const _HandlerID_name = "handlerInvalidLockLockLockRLockLockUnlockLockRUnlockLoc
 var _HandlerID_index = [...]uint16{0, 14, 22, 31, 41, 52, 63, 78, 85, 92, 100, 109, 115, 126, 136, 149, 163, 176, 186, 196, 206, 213, 225, 230, 236, 256, 274, 301, 315, 328, 345, 369, 381, 391, 408, 428, 446, 456, 464, 473, 483, 493, 503, 515, 525, 543, 553, 564, 573, 586, 596, 603, 613, 625, 639, 651, 668, 682, 694, 708, 727, 749, 769, 780, 790, 797, 805, 825, 844, 857, 869, 877, 888, 904, 915, 926, 936, 949, 960, 971, 983, 994}
 
 func (i HandlerID) String() string {
-	if i >= HandlerID(len(_HandlerID_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_HandlerID_index)-1 {
 		return "HandlerID(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _HandlerID_name[_HandlerID_index[i]:_HandlerID_index[i+1]]
+	return _HandlerID_name[_HandlerID_index[idx]:_HandlerID_index[idx+1]]
 }
