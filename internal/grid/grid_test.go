@@ -1251,6 +1251,171 @@ func testServerStreamPingRunning(t *testing.T, local, remote *Manager, inCap int
 	<-serverCanceled
 }
 
+// newTestStreamMux registers a client mux on c the way RequestStream does,
+// but sends nothing to the remote. The tests below then play the two parts
+// that end a stream themselves: the connection's reader (handleMuxServerMsg)
+// and the goroutine of the stream (handleOneWayStream, deleteMux).
+func newTestStreamMux(t *testing.T, c *Connection) (*muxClient, chan Response) {
+	t.Helper()
+	m, err := c.newMuxClient(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	responses := make(chan Response, 1)
+	m.init = true
+	m.respWait = responses
+	return m, responses
+}
+
+// TestStreamEOFNoCancel checks that the end of a stream does not cancel the
+// context of the stream.
+//
+// When the last message of a stream arrives, the reader closes the mux under
+// its lock. That wakes the goroutine of the stream, which calls deleteMux.
+// If deleteMux still finds the mux registered, it calls close() on it, and
+// close() cancels the context when it finds the lock held. Results then
+// returned "context canceled" for a stream that had delivered everything.
+func TestStreamEOFNoCancel(t *testing.T) {
+	defer testlogger.T.SetErrorTB(t)()
+	defer timeout(time.Minute)()
+	grid, err := SetupTestGrid(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(grid.Cleanup)
+	c := grid.Managers[0].Connection(grid.Hosts[1])
+
+	// After it has closed the response channel, the reader holds the lock
+	// for a few instructions only, and the goroutine of the stream has to
+	// get to deleteMux within them. To keep the reader there for longer,
+	// park receivers on the channel that do nothing: closing a channel
+	// wakes its receivers one by one, and the reader holds the lock until
+	// the last one is awake.
+	const streams, parked = 20, 2000
+	for i := range streams {
+		m, responses := newTestStreamMux(t, c)
+		var wg sync.WaitGroup
+		for range parked {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				<-responses
+			}()
+		}
+		// What RequestStream starts for a stream without requests.
+		responseCh := make(chan Response, 1)
+		go m.handleOneWayStream(responseCh, responses)
+		st := &Stream{responses: responseCh, ctx: m.ctx, cancel: m.cancelFn, muxID: m.MuxID}
+		// Let all of them block on the channel.
+		time.Sleep(10 * time.Millisecond)
+
+		c.handleMuxServerMsg(t.Context(), message{Op: OpMuxServerMsg, MuxID: m.MuxID, Flags: FlagEOF})
+		wg.Wait()
+		// The goroutine of the stream closes the channel to Results when
+		// it is done.
+		if resp, ok := <-responseCh; ok {
+			t.Fatalf("stream %d: unexpected response %+v", i, resp)
+		}
+		if err := context.Cause(m.ctx); err != nil {
+			t.Fatalf("stream %d: the end of the stream canceled its context: %v", i, err)
+		}
+		if err := st.Results(func([]byte) error { return nil }); err != nil {
+			t.Fatalf("stream %d: Results returned %v for a stream that ended normally", i, err)
+		}
+	}
+}
+
+// TestStreamEOFDisconnect checks that a mux stays registered while the reader
+// waits for its lock at the end of a stream.
+//
+// The lock may be held by a send that waits for room in the queue of the
+// connection. Such a send returns only when the context of the mux is
+// canceled, and when the connection is lost that is done for every mux that
+// is registered. A mux that the reader has taken out of the table before it
+// holds the lock keeps the send, the reader and the caller of Results waiting.
+func TestStreamEOFDisconnect(t *testing.T) {
+	defer testlogger.T.SetErrorTB(t)()
+	defer timeout(time.Minute)()
+	grid, err := SetupTestGrid(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(grid.Cleanup)
+	c := grid.Managers[0].Connection(grid.Hosts[1])
+	m, _ := newTestStreamMux(t, c)
+
+	// Stand in for the send: it holds the lock until the context of the
+	// mux is canceled.
+	m.respMu.Lock()
+	go func() {
+		<-m.ctx.Done()
+		m.respMu.Unlock()
+	}()
+	readerDone := make(chan struct{})
+	go func() {
+		defer close(readerDone)
+		c.handleMuxServerMsg(t.Context(), message{Op: OpMuxServerMsg, MuxID: m.MuxID, Flags: FlagEOF})
+	}()
+	// Let the reader get as far as the lock.
+	time.Sleep(50 * time.Millisecond)
+
+	// What the writer of the connection does when it exits.
+	c.disconnected()
+	select {
+	case <-readerDone:
+	case <-time.After(10 * time.Second):
+		t.Fatal("the reader still waits for the lock of the mux after the connection was lost")
+	}
+	if err := context.Cause(m.ctx); !errors.Is(err, ErrDisconnected) {
+		t.Errorf("cause of the canceled stream: got %v, want %v", err, ErrDisconnected)
+	}
+}
+
+// TestStreamRemoteErrNotLost checks that Results returns the error that the
+// remote handler ended the stream with.
+//
+// The reader queues that error as a response and also cancels the context of
+// the stream with it. On a busy machine the goroutine of the stream gets to
+// run only after both. It may then act on the canceled context first and
+// close the channel to Results without passing the error on. Results returned
+// nil for such a stream: a call that completed, with no result.
+func TestStreamRemoteErrNotLost(t *testing.T) {
+	defer testlogger.T.SetErrorTB(t)()
+	defer timeout(time.Minute)()
+	grid, err := SetupTestGrid(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(grid.Cleanup)
+	c := grid.Managers[0].Connection(grid.Hosts[1])
+
+	// The goroutine of the stream and Results each choose between ready
+	// cases at random, so one stream proves nothing.
+	const remoteErr = "remote handler failed"
+	for i := range 200 {
+		m, responses := newTestStreamMux(t, c)
+		c.handleMuxServerMsg(t.Context(), message{
+			Op:      OpMuxServerMsg,
+			MuxID:   m.MuxID,
+			Flags:   FlagEOF | FlagPayloadIsErr,
+			Payload: []byte(remoteErr),
+		})
+
+		// The goroutine of the stream runs to its end before the caller
+		// gets to Results.
+		responseCh := make(chan Response, 1)
+		m.handleOneWayStream(responseCh, responses)
+		st := &Stream{responses: responseCh, ctx: m.ctx, cancel: m.cancelFn, muxID: m.MuxID}
+		err := st.Results(func(b []byte) error {
+			t.Errorf("stream %d: unexpected response %q", i, b)
+			return nil
+		})
+		if err == nil || err.Error() != remoteErr {
+			t.Fatalf("stream %d: Results returned %v, want the remote error %q", i, err, remoteErr)
+		}
+	}
+}
+
 func timeout(after time.Duration) (cancel func()) {
 	c := time.After(after)
 	cc := make(chan struct{})
