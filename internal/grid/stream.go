@@ -86,6 +86,12 @@ func (s *Stream) Results(next func(b []byte) error) (err error) {
 		case resp, ok := <-s.responses:
 			if !ok {
 				done = true
+				// The channel can close before the error that ended
+				// the stream was passed on. Return that error then,
+				// not a stream that completed.
+				if err := context.Cause(s.ctx); err != nil && !errors.Is(err, errStreamEOF) {
+					return err
+				}
 				return nil
 			}
 			if resp.Err != nil {

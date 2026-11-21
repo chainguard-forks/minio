@@ -1642,12 +1642,19 @@ func (c *Connection) handleMuxServerMsg(ctx context.Context, m message) {
 		// We must obtain the lock before closing
 		// Otherwise others may pick up the error before close is called.
 		v.respMu.Lock()
+		// Forget the mux before closing it. Closing wakes the goroutine
+		// of the stream, which calls deleteMux. If that still found the
+		// mux, it would call close() on it while we hold the lock, and
+		// close() would cancel a stream that has ended normally.
+		// Not before we hold the lock: while we wait for it, a
+		// disconnect must still find the mux, to cancel a send that
+		// holds the lock.
+		c.outgoing.Delete(m.MuxID)
 		v.closeLocked()
 		v.respMu.Unlock()
 		if debugReqs {
 			fmt.Println(m.MuxID, c.String(), "handleMuxServerMsg: DELETING MUX")
 		}
-		c.outgoing.Delete(m.MuxID)
 	}
 }
 
