@@ -261,7 +261,7 @@ fi
 sleep 30s
 
 # Check site replication info and status for new site
-sitesCount=$(mc admin replicate info sited --json | jq '.sites | length')
+sitesCount=$(./mc admin replicate info sited --json | jq '.sites | length')
 if [ ${sitesCount} -ne 3 ]; then
 	echo "BUG: New site 'sited' not appearing in site replication info"
 	exit 1
