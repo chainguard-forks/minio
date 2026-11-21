@@ -37,8 +37,9 @@ const _scannerMetric_name = "ReadMetadataCheckMissingSaveUsageApplyAllApplyVersi
 var _scannerMetric_index = [...]uint8{0, 12, 24, 33, 41, 53, 65, 74, 77, 93, 98, 112, 127, 147, 157, 167, 186, 198, 208, 217, 232, 245, 249}
 
 func (i scannerMetric) String() string {
-	if i >= scannerMetric(len(_scannerMetric_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_scannerMetric_index)-1 {
 		return "scannerMetric(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _scannerMetric_name[_scannerMetric_index[i]:_scannerMetric_index[i+1]]
+	return _scannerMetric_name[_scannerMetric_index[idx]:_scannerMetric_index[idx+1]]
 }

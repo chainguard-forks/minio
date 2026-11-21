@@ -24,8 +24,9 @@ const _debugMsg_name = "debugShutdowndebugKillInbounddebugKillOutbounddebugWaitF
 var _debugMsg_index = [...]uint8{0, 13, 29, 46, 62, 86, 112, 130, 151, 176}
 
 func (i debugMsg) String() string {
-	if i < 0 || i >= debugMsg(len(_debugMsg_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_debugMsg_index)-1 {
 		return "debugMsg(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _debugMsg_name[_debugMsg_index[i]:_debugMsg_index[i+1]]
+	return _debugMsg_name[_debugMsg_index[idx]:_debugMsg_index[idx+1]]
 }

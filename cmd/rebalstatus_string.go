@@ -20,8 +20,9 @@ const _rebalStatus_name = "NoneStartedCompletedStoppedFailed"
 var _rebalStatus_index = [...]uint8{0, 4, 11, 20, 27, 33}
 
 func (i rebalStatus) String() string {
-	if i >= rebalStatus(len(_rebalStatus_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_rebalStatus_index)-1 {
 		return "rebalStatus(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _rebalStatus_name[_rebalStatus_index[i]:_rebalStatus_index[i+1]]
+	return _rebalStatus_name[_rebalStatus_index[idx]:_rebalStatus_index[idx+1]]
 }

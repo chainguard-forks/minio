@@ -32,8 +32,9 @@ const _STSErrorCode_name = "STSNoneSTSAccessDeniedSTSMissingParameterSTSInvalidP
 var _STSErrorCode_index = [...]uint16{0, 7, 22, 41, 65, 91, 118, 145, 171, 192, 219, 244, 261, 281, 297, 313, 331, 353}
 
 func (i STSErrorCode) String() string {
-	if i < 0 || i >= STSErrorCode(len(_STSErrorCode_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_STSErrorCode_index)-1 {
 		return "STSErrorCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _STSErrorCode_name[_STSErrorCode_index[i]:_STSErrorCode_index[i+1]]
+	return _STSErrorCode_name[_STSErrorCode_index[idx]:_STSErrorCode_index[idx+1]]
 }

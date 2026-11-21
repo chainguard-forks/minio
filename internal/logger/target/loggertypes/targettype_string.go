@@ -18,9 +18,9 @@ const _TargetType_name = "ConsoleHTTPKafka"
 var _TargetType_index = [...]uint8{0, 7, 11, 16}
 
 func (i TargetType) String() string {
-	i -= 1
-	if i >= TargetType(len(_TargetType_index)-1) {
-		return "TargetType(" + strconv.FormatInt(int64(i+1), 10) + ")"
+	idx := int(i) - 1
+	if i < 1 || idx >= len(_TargetType_index)-1 {
+		return "TargetType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _TargetType_name[_TargetType_index[i]:_TargetType_index[i+1]]
+	return _TargetType_name[_TargetType_index[idx]:_TargetType_index[idx+1]]
 }

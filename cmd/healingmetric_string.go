@@ -18,8 +18,9 @@ const _healingMetric_name = "BucketObjectCheckAbandonedParts"
 var _healingMetric_index = [...]uint8{0, 6, 12, 31}
 
 func (i healingMetric) String() string {
-	if i >= healingMetric(len(_healingMetric_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_healingMetric_index)-1 {
 		return "healingMetric(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _healingMetric_name[_healingMetric_index[i]:_healingMetric_index[i+1]]
+	return _healingMetric_name[_healingMetric_index[idx]:_healingMetric_index[idx+1]]
 }

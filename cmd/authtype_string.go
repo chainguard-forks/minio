@@ -27,8 +27,9 @@ const _authType_name = "UnknownAnonymousPresignedPresignedV2PostPolicyStreamingS
 var _authType_index = [...]uint8{0, 7, 16, 25, 36, 46, 61, 67, 75, 78, 81, 103, 127}
 
 func (i authType) String() string {
-	if i < 0 || i >= authType(len(_authType_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_authType_index)-1 {
 		return "authType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _authType_name[_authType_index[i]:_authType_index[i+1]]
+	return _authType_name[_authType_index[idx]:_authType_index[idx+1]]
 }

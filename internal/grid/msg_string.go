@@ -32,9 +32,9 @@ const _Op_name = "ConnectConnectResponsePingPongConnectMuxMuxConnectErrorDisconn
 var _Op_index = [...]uint8{0, 7, 22, 26, 30, 40, 55, 74, 93, 105, 117, 130, 142, 148, 155, 163, 173, 179}
 
 func (i Op) String() string {
-	i -= 1
-	if i >= Op(len(_Op_index)-1) {
-		return "Op(" + strconv.FormatInt(int64(i+1), 10) + ")"
+	idx := int(i) - 1
+	if i < 1 || idx >= len(_Op_index)-1 {
+		return "Op(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Op_name[_Op_index[i]:_Op_index[i+1]]
+	return _Op_name[_Op_index[idx]:_Op_index[idx+1]]
 }

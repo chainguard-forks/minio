@@ -20,10 +20,11 @@ const _VersionType_name = "invalidVersionTypeObjectTypeDeleteTypeLegacyTypelastV
 var _VersionType_index = [...]uint8{0, 18, 28, 38, 48, 63}
 
 func (i VersionType) String() string {
-	if i >= VersionType(len(_VersionType_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_VersionType_index)-1 {
 		return "VersionType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _VersionType_name[_VersionType_index[i]:_VersionType_index[i+1]]
+	return _VersionType_name[_VersionType_index[idx]:_VersionType_index[idx+1]]
 }
 func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
@@ -39,8 +40,9 @@ const _ErasureAlgo_name = "invalidErasureAlgoReedSolomonlastErasureAlgo"
 var _ErasureAlgo_index = [...]uint8{0, 18, 29, 44}
 
 func (i ErasureAlgo) String() string {
-	if i >= ErasureAlgo(len(_ErasureAlgo_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ErasureAlgo_index)-1 {
 		return "ErasureAlgo(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ErasureAlgo_name[_ErasureAlgo_index[i]:_ErasureAlgo_index[i+1]]
+	return _ErasureAlgo_name[_ErasureAlgo_index[idx]:_ErasureAlgo_index[idx+1]]
 }

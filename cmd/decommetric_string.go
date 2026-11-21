@@ -18,8 +18,9 @@ const _decomMetric_name = "DecommissionBucketDecommissionObjectDecommissionRemov
 var _decomMetric_index = [...]uint8{0, 18, 36, 60}
 
 func (i decomMetric) String() string {
-	if i >= decomMetric(len(_decomMetric_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_decomMetric_index)-1 {
 		return "decomMetric(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _decomMetric_name[_decomMetric_index[i]:_decomMetric_index[i+1]]
+	return _decomMetric_name[_decomMetric_index[idx]:_decomMetric_index[idx+1]]
 }
