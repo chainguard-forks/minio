@@ -44,7 +44,7 @@ func testStorageAPIDiskInfo(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 		if err != errUnformattedDisk {
 			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, errUnformattedDisk, err)
@@ -73,7 +73,7 @@ func testStorageAPIStatInfoFile(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, expectErr, testCase.expectErr, err)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 	}
 }
@@ -133,7 +133,7 @@ func testStorageAPIReadAll(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 
 		if !testCase.expectErr {
@@ -170,7 +170,7 @@ func testStorageAPIReadFile(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 
 		if !testCase.expectErr {
@@ -212,7 +212,7 @@ func testStorageAPIAppendFile(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 
 		if !testCase.expectErr {
@@ -254,7 +254,7 @@ func testStorageAPIDeleteFile(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 	}
 }
@@ -288,7 +288,7 @@ func testStorageAPIRenameFile(t *testing.T, storage StorageAPI) {
 		expectErr := (err != nil)
 
 		if expectErr != testCase.expectErr {
-			t.Fatalf("case %v: error: expected: %v, got: %v", i+1, testCase.expectErr, expectErr)
+			t.Fatalf("case %v: error: expected: %v, got: %v, err: %v", i+1, testCase.expectErr, expectErr, err)
 		}
 	}
 }
@@ -318,7 +318,7 @@ func newStorageRESTHTTPServerClient(t testing.TB) *storageRESTClient {
 
 	endpoint, err := NewEndpoint(url.String())
 	if err != nil {
-		t.Fatalf("NewEndpoint failed %v", endpoint)
+		t.Fatalf("NewEndpoint failed %v", err)
 	}
 
 	if err = endpoint.UpdateIsLocal(); err != nil {
